@@ -1,0 +1,8 @@
+project ser
+exit
+set offline in Global := true
+exit
+clean
+exit
+clean
+exit
