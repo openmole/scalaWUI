@@ -1,12 +1,14 @@
-# ServerTest #
+# ScalaTraJSTagsWireRx #
 
 ## Build & Run ##
 
 ```sh
-$ cd ServerTest
-$ ./sbt
-> container:start
-> browse
+$ cd scalaTraJSTagsWireRx
+$ sbt
+> project ui
+> toJS // Build the client JS files
+> project server
+> container:restart
 ```
 
-If `browse` doesn't launch your browser, manually open [http://localhost:8080/](http://localhost:8080/) in your browser.
+Then open [http://localhost:8080/](http://localhost:8080/) in your browser.
