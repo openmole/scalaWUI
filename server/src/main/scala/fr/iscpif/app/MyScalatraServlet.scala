@@ -13,14 +13,16 @@ object Server extends Api {
 
 class MyScalatraServlet extends ServertestStack {
 
+  val basePath = "shared"
+
   get("/") {
     contentType = "text/html"
     jade("/default.jade")
   }
 
-  post("/shared/Api/hello") {
+  post(s"/$basePath/*") {
     Await.result(autowire.Macros.route[Web](Server)(
-      autowire.Request(Seq("shared", "Api", "hello"),
+      autowire.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
         upickle.read[Map[String, String]](request.body))
     ),100.seconds)
 
