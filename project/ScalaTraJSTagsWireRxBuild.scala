@@ -28,8 +28,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "com.scalarx" %%% "scalarx" % "0.2.5",
         "fr.iscpif" %%% "scaladget" % "0.1.0-SNAPSHOT",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
-        "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6",
-      "org.scala-lang.modules" %% "scala-async" % "0.9.2"
+        "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
       ),
       jsCall := "Plot().run();",
       outputPath := "server/src/main/webapp/"
