@@ -2,8 +2,6 @@ import sbt._
 import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
-import com.mojolly.scalate.ScalatePlugin._
-import ScalateKeys._
 import fr.iscpif.jsmanager.JSManagerPlugin._
 
 object ScalaTraJSTagsWireRxBuild extends Build {
@@ -41,7 +39,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   lazy val server = Project(
     "server",
     file("./server"),
-    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ scalateSettings ++ jsManagerSettings ++ Seq(
+    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ jsManagerSettings ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,

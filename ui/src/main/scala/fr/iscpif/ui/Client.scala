@@ -1,10 +1,8 @@
 package ui
 
 import org.scalajs.dom
-import org.scalajs.dom.{XMLHttpRequest, HTMLElement}
-import scala.concurrent.duration._
-import scala.concurrent.{Future, Await}
-import scala.util.{Failure, Success}
+import org.scalajs.dom.HTMLElement
+import scala.concurrent.Future
 import scalatags.JsDom._
 import all._
 import tags2.section
