@@ -24,7 +24,7 @@ class MyScalatraServlet extends ServertestStack {
     Await.result(autowire.Macros.route[Web](Server)(
       autowire.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
         upickle.read[Map[String, String]](request.body))
-    ),100.seconds)
+    ),Duration.Inf)
 
   }
 }
