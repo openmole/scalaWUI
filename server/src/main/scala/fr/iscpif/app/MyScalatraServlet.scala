@@ -1,5 +1,7 @@
 package fr.iscpif.app
 
+import java.util.UUID
+
 import org.scalatra._
 import scala.concurrent.ExecutionContext.Implicits.global
 import autowire._

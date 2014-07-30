@@ -1,4 +1,6 @@
-package ui
+package client
+
+import java.util.UUID
 
 import org.scalajs.dom
 import org.scalajs.dom.HTMLElement
@@ -13,11 +15,10 @@ import org.scalajs.dom.extensions.Ajax
 import scala.Some
 import shared._
 import autowire._
-
-import fr.iscpif.scaladget.JsRxTags._
+import JsRxTags._
 
 @JSExport
-object Plot {
+object Client {
 
   val helloValue = Var(0)
 
@@ -43,6 +44,7 @@ object Post extends autowire.Client[Web] {
 
   override def callRequest(req: Request): Future[String] = {
     val url = req.path.mkString("/")
+    println(" URL " + url)
     dom.extensions.Ajax.post(
       url = "http://localhost:8080/" + url,
       data = upickle.write(req.args)

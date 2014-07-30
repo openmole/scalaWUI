@@ -14,9 +14,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   lazy val shared = project.in(file("./shared"))
                            .settings(scalaVersion := ScalaVersion)
 
-  lazy val ui = Project(
-    "ui",
-    file("./ui"),
+  lazy val client = Project(
+    "client",
+    file("./client"),
     settings = Defaults.defaultSettings ++ jsManagerSettings ++ Seq(
       version := Version,
       scalaVersion := ScalaVersion,
@@ -26,7 +26,6 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "com.lihaoyi" %%% "autowire" % "0.1.2",
         "com.scalatags" %%% "scalatags" % "0.3.8",
         "com.scalarx" %%% "scalarx" % "0.2.5",
-        "fr.iscpif" %%% "scaladget" % "0.1.0-SNAPSHOT",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
       ),
@@ -38,7 +37,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   lazy val server = Project(
     "server",
     file("./server"),
-    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ jsManagerSettings ++ Seq(
+    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
