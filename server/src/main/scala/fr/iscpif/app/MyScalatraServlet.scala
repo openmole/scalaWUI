@@ -11,6 +11,7 @@ import scala.concurrent.Await
 
 object Server extends Api {
   def hello(a: Int) = a * 3
+  def caseClass(c: MyCaseClass) = c.oo
 }
 
 class MyScalatraServlet extends ServertestStack {
@@ -27,6 +28,6 @@ class MyScalatraServlet extends ServertestStack {
       autowire.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
         upickle.read[Map[String, String]](request.body))
     ),Duration.Inf)
-
   }
+
 }

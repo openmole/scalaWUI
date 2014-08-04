@@ -11,8 +11,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   val ScalaVersion = "2.11.1"
   val ScalatraVersion = "2.3.0"
 
-  lazy val shared = project.in(file("./shared"))
-                           .settings(scalaVersion := ScalaVersion)
+  lazy val shared = project.in(file("./shared")).settings(
+    scalaVersion := ScalaVersion
+  ).settings(jsManagerSettings: _*)
 
   lazy val client = Project(
     "client",
@@ -29,7 +30,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
       ),
-      jsCall := "Plot().run();",
+      jsCall := "Client().run();",
       outputPath := "server/src/main/webapp/"
     )
   ).dependsOn(shared)

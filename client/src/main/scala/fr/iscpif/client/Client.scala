@@ -21,30 +21,43 @@ import JsRxTags._
 object Client {
 
   val helloValue = Var(0)
+  val caseClassValue = Var("empty")
 
   @JSExport
   def run() {
-    val submitButton = button("Click me")(
+    val submitButton1 = button("Click me")(
       cursor := "pointer",
-      onclick := { () => Post[Api](_.hello(5)).foreach { i =>
-        helloValue() = helloValue() + i
+      onclick := { () =>
+        Post[Api](_.hello(5)).foreach { i =>
+          helloValue() = helloValue() + i
+        }
       }
+    ).render
+
+    val submitButton2 = button("Click me")(
+      cursor := "pointer",
+      onclick := { () =>
+        Post[Api](_.caseClass(MyCaseClass("Hello !"))).foreach { s =>
+          caseClassValue() = s
+        }
         false
       }
     ).render
 
     Rx {
-      dom.document.body.appendChild(submitButton)
+      dom.document.body.appendChild(submitButton1)
+      dom.document.body.appendChild(submitButton2)
       dom.document.body.appendChild(h1(helloValue).render)
+      dom.document.body.appendChild(h1(caseClassValue).render)
     }
   }
+
 }
 
 object Post extends autowire.Client[Web] {
 
   override def callRequest(req: Request): Future[String] = {
     val url = req.path.mkString("/")
-    println(" URL " + url)
     dom.extensions.Ajax.post(
       url = "http://localhost:8080/" + url,
       data = upickle.write(req.args)
