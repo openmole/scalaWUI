@@ -24,9 +24,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       resolvers ++= Seq(Resolver.sonatypeRepo("snapshots"),
         "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"),
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %%% "autowire" % "0.1.2",
-        "com.scalatags" %%% "scalatags" % "0.3.8",
-        "com.scalarx" %%% "scalarx" % "0.2.5",
+        "com.lihaoyi" %%% "autowire" % "0.1.3",
+        "com.scalatags" %%% "scalatags" % "0.3.9",
+        "com.scalarx" %%% "scalarx" % "0.2.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
       ),

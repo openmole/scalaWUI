@@ -58,7 +58,7 @@ object JsRxTags {
       last.parentElement.replaceChild(newLast, last)
       last = newLast
     }
-    bindElement(last)
+    bindNode(last)
   }
 
   implicit def RxAttrValue[T: scalatags.JsDom.AttrValue] = new scalatags.JsDom.AttrValue[Rx[T]] {
