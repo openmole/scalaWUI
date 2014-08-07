@@ -37,16 +37,17 @@ object Client {
     val submitButton2 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
-        Post[Api](_.caseClass(MyCaseClass("Hello !"))).foreach { s =>
-          caseClassValue() = s
+        Post[Api](_.caseClass).foreach { s =>
+          caseClassValue() = s.hello
         }
         false
       }
     ).render
 
-    Rx {
       dom.document.body.appendChild(submitButton1)
       dom.document.body.appendChild(submitButton2)
+
+    Rx {
       dom.document.body.appendChild(h1(helloValue).render)
       dom.document.body.appendChild(h1(caseClassValue).render)
     }

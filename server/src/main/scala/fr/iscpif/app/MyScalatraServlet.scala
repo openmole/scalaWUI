@@ -11,7 +11,7 @@ import scala.concurrent.Await
 
 object Server extends Api {
   def hello(a: Int) = a * 3
-  def caseClass(c: MyCaseClass) = c.oo
+  def caseClass = MyCaseClass("Hello !")
 }
 
 class MyScalatraServlet extends ServertestStack {

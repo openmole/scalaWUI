@@ -5,12 +5,13 @@ import scala.scalajs.js.annotation.JSExport
 
 class Web extends ClassfileAnnotation
 
+@Web
 @JSExport
-case class MyCaseClass(oo: String)
+case class MyCaseClass(hello: String)
 
 
 @Web
 trait Api {
   def hello(a: Int): Int
-  def caseClass(cc: MyCaseClass): String
+  def caseClass(): MyCaseClass
 }
