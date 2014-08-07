@@ -10,6 +10,11 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.11.1"
   val ScalatraVersion = "2.3.0"
+  val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
+    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+    Resolver.url("scala-js-releases",
+      url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
+        Resolver.ivyStylePatterns))
 
   lazy val shared = project.in(file("./shared")).settings(
     scalaVersion := ScalaVersion
@@ -21,8 +26,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
     settings = Defaults.defaultSettings ++ jsManagerSettings ++ Seq(
       version := Version,
       scalaVersion := ScalaVersion,
-      resolvers ++= Seq(Resolver.sonatypeRepo("snapshots"),
-        "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"),
+      resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.1.3",
         "com.scalatags" %%% "scalatags" % "0.3.9",
@@ -43,8 +47,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       name := Name,
       version := Version,
       scalaVersion := ScalaVersion,
-      resolvers ++= Seq(Resolver.sonatypeRepo("snapshots"),
-        "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"),
+      resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "upickle" % "0.1.7",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
