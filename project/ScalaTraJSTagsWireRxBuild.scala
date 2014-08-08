@@ -28,8 +28,8 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %%% "autowire" % "0.1.3",
-        "com.scalatags" %%% "scalatags" % "0.3.9",
+        "com.lihaoyi" %%% "autowire" % "0.1.2",
+        "com.scalatags" %%% "scalatags" % "0.4.0",
         "com.scalarx" %%% "scalarx" % "0.2.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
