@@ -4,6 +4,7 @@ import java.util.UUID
 
 import org.scalatra._
 import scala.concurrent.ExecutionContext.Implicits.global
+import upickle._
 import autowire._
 import shared._
 import scala.concurrent.duration._

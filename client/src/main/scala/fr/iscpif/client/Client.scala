@@ -14,6 +14,7 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import org.scalajs.dom.extensions.Ajax
 import scala.Some
 import shared._
+import upickle._
 import autowire._
 import JsRxTags._
 
