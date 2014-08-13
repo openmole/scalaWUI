@@ -35,7 +35,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
       ),
-      jsCall := "Client().run();",
+      //jsCall := "Client().run();",
       outputPath := "server/src/main/webapp/"
     )
   ).dependsOn(shared)
@@ -52,9 +52,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.1.2",
         "com.lihaoyi" %%% "upickle" % "0.2.1",
+        "com.scalatags" %%% "scalatags" % "0.4.0",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
-        "org.scalatra" %% "scalatra-scalate" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "container",
