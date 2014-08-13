@@ -29,7 +29,7 @@ object Client {
     val submitButton1 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
-        Post[Api](_.hello(5)).foreach { i =>
+        Post(_.hello(5)).foreach { i =>
           helloValue() = helloValue() + i
         }
       }
@@ -38,7 +38,7 @@ object Client {
     val submitButton2 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
-        Post[Api](_.caseClass).foreach { s =>
+        Post(_.caseClass).foreach { s =>
           caseClassValue() = s.hello
         }
         false
@@ -56,7 +56,7 @@ object Client {
 
 }
 
-object Post extends autowire.Client[Web] {
+object Post extends autowire.Client[Api] {
 
   override def callRequest(req: Request): Future[String] = {
     val url = req.path.mkString("/")
