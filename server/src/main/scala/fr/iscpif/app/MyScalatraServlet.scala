@@ -7,6 +7,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import upickle._
 import autowire._
 import shared._
+import upickle._
 import scala.concurrent.duration._
 import scala.concurrent.Await
 
