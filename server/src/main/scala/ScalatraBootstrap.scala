@@ -9,6 +9,6 @@ class ScalatraBootstrap extends LifeCycle {
   //val serv =  new MyScalatraServlet
    // pluginROutes.foreach{serv.addRoute}
 
-    context.mount(new MyScalatraServlet, "/*")
+    context.mount(new Server, "/*")
   }
 }

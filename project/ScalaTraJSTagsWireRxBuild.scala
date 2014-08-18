@@ -28,8 +28,8 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %%% "autowire" % "0.1.4",
-        "com.lihaoyi" %%% "upickle" % "0.2.1",
+        "com.lihaoyi" %%% "autowire" % "0.2.2",
+        "com.lihaoyi" %%% "upickle" % "0.2.2",
         "com.scalatags" %%% "scalatags" % "0.4.0",
         "com.scalarx" %%% "scalarx" % "0.2.6",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
@@ -50,10 +50,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %% "autowire" % "0.1.4",
-        "com.lihaoyi" %%% "upickle" % "0.2.1",
+        "com.lihaoyi" %% "autowire" % "0.2.1",
+        "com.lihaoyi" %% "upickle" % "0.2.1",
         "com.scalatags" %%% "scalatags" % "0.4.0",
-        "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",

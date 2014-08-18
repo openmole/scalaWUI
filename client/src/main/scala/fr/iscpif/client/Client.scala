@@ -29,7 +29,7 @@ object Client {
     val submitButton1 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
-        Post(_.hello(5)).foreach { i =>
+        Post[Api].hello(5).call().foreach { i =>
           helloValue() = helloValue() + i
         }
       }
@@ -38,17 +38,18 @@ object Client {
     val submitButton2 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
-        Post(_.caseClass).foreach { s =>
+        Post[Api].caseClass.call().foreach { s =>
           caseClassValue() = s.hello
         }
         false
       }
     ).render
 
-      dom.document.body.appendChild(submitButton1)
-      dom.document.body.appendChild(submitButton2)
+    dom.document.body.appendChild(submitButton1)
+    dom.document.body.appendChild(submitButton2)
 
     Rx {
+      println("RX " + helloValue)
       dom.document.body.appendChild(h1(helloValue).render)
       dom.document.body.appendChild(h1(caseClassValue).render)
     }
@@ -56,9 +57,9 @@ object Client {
 
 }
 
-object Post extends autowire.Client[Api] {
+object Post extends autowire.Client[String, upickle.Reader, upickle.Writer] {
 
-  override def callRequest(req: Request): Future[String] = {
+  override def doCall(req: Request): Future[String] = {
     val url = req.path.mkString("/")
     dom.extensions.Ajax.post(
       url = "http://localhost:8080/" + url,
@@ -67,4 +68,8 @@ object Post extends autowire.Client[Api] {
       _.responseText
     }
   }
+
+  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
+
+  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
 }
