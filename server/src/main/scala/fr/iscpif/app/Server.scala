@@ -20,7 +20,6 @@ object AutowireServer extends autowire.Server[String, upickle.Reader, upickle.Wr
 
 object ApiImpl extends Api {
   def hello(a: Int) = a * 3
-
   def caseClass = MyCaseClass("Hello !")
 }
 

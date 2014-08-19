@@ -12,6 +12,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
   val ScalatraVersion = "2.3.0"
   val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
     "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+    "bintray/non" at "http://dl.bintray.com/non/maven",
     Resolver.url("scala-js-releases",
       url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
         Resolver.ivyStylePatterns))
@@ -50,9 +51,9 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %% "autowire" % "0.2.1",
-        "com.lihaoyi" %% "upickle" % "0.2.1",
-        "com.scalatags" %%% "scalatags" % "0.4.0",
+        "com.lihaoyi" %% "autowire" % "0.2.2",
+        "com.lihaoyi" %% "upickle" % "0.2.2",
+        "com.scalatags" %% "scalatags" % "0.4.0",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
