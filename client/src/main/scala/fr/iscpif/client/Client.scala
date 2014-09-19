@@ -26,7 +26,7 @@ object Client {
 
   @JSExport
   def run() {
-    val submitButton1 = button("Click me")(
+   /* val submitButton1 = button("Click me")(
       cursor := "pointer",
       onclick := { () =>
         Post[Api].hello(5).call().foreach { i =>
@@ -53,6 +53,16 @@ object Client {
       dom.document.body.appendChild(h1(helloValue).render)
       dom.document.body.appendChild(h1(caseClassValue).render)
     }
+  }*/
+    val nodes = scala.Array(
+      new Task("1",Var("one"),Var((400,600))),
+      new Task("2",Var("two"),Var((1000,600))),
+      new Task("3",Var("three"),Var((400,100))),
+      new Task("4",Var("four"),Var((1000,100))),
+      new Task("5",Var("five"),Var((105,60)))
+    )
+    val edges = scala.Array(new Edge(Var(nodes(0)),Var(nodes(1))),new Edge(Var(nodes(0)),Var(nodes(2))),new Edge(Var(nodes(3)),Var(nodes(1))))
+    val window = new Window(nodes,edges)
   }
 
 }

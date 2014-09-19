@@ -5,6 +5,6 @@ resolvers ++= Seq(Resolver.url("scala-js-releases",
 resolvers += "Typesafe repository" at
   "http://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("fr.iscpif" %% "jsmanager" % "0.2.0")
+addSbtPlugin("fr.iscpif" %% "jsmanager" % "0.4.0")
 
 addSbtPlugin("org.scalatra.sbt" % "scalatra-sbt" % "0.3.5")

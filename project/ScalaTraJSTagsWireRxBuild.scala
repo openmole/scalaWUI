@@ -29,12 +29,12 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %%% "autowire" % "0.2.2",
-        "com.lihaoyi" %%% "upickle" % "0.2.2",
+        "com.lihaoyi" %%% "autowire" % "0.2.3",
+        "com.lihaoyi" %%% "upickle" % "0.2.4",
         "com.scalatags" %%% "scalatags" % "0.4.0",
         "com.scalarx" %%% "scalarx" % "0.2.6",
-        "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
-        "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
+        "fr.iscpif" %%% "scaladget" % "0.1.0",
+        "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
       ),
       //jsCall := "Client().run();",
       outputPath := "server/src/main/webapp/"
@@ -51,8 +51,8 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %% "autowire" % "0.2.2",
-        "com.lihaoyi" %% "upickle" % "0.2.2",
+        "com.lihaoyi" %% "autowire" % "0.2.3",
+        "com.lihaoyi" %% "upickle" % "0.2.4",
         "com.scalatags" %% "scalatags" % "0.4.0",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
