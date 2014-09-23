@@ -8,16 +8,22 @@ The project aims at building a small but complete client / server application us
 - [scala.rx](https://github.com/lihaoyi/scala.rx)
 - [autowire](https://github.com/lihaoyi/autowire)
 
+This prototype exposes a Graph editor inspired from [http://bl.ocks.org/cjrd/6863459](http://bl.ocks.org/cjrd/6863459) javascript example.
 
 ## Build & Run ##
 
 ```sh
 $ cd scalaTraJSTagsWireRx
 $ sbt
-> project ui
 > toJS // Build the client JS files
-> project server
 > container:restart // Start the server
 ```
 
 Then open [http://localhost:8080/](http://localhost:8080/) in your browser.
+
+## Play with the graph ##
+
+- drag to translate the graph
+- shift-click on graph to create a node
+- shift-click on a node and then drag to another node to connect them with a directed edge
+- click on node or edge and press delete to delete
