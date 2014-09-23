@@ -13,9 +13,9 @@ import scala.concurrent.Await
 import scalatags.Text.all._
 import scalatags.Text.{all => tags}
 
-object AutowireServer extends autowire.Server[String, upickle.Reader, upickle.Writer]{
- def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
- def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+object AutowireServer extends autowire.Server[String, upickle.Reader, upickle.Writer] {
+  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
+  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
 }
 
 object ApiImpl extends Api {
@@ -23,7 +23,7 @@ object ApiImpl extends Api {
   def caseClass = MyCaseClass("Hello !")
 }
 
-class Server extends ScalatraServlet {
+class Servlet extends ScalatraServlet {
 
   val basePath = "shared"
 

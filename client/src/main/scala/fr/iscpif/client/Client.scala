@@ -26,43 +26,19 @@ object Client {
 
   @JSExport
   def run() {
-   /* val submitButton1 = button("Click me")(
-      cursor := "pointer",
-      onclick := { () =>
-        Post[Api].hello(5).call().foreach { i =>
-          helloValue() = helloValue() + i
-        }
-      }
-    ).render
-
-    val submitButton2 = button("Click me")(
-      cursor := "pointer",
-      onclick := { () =>
-        Post[Api].caseClass.call().foreach { s =>
-          caseClassValue() = s.hello
-        }
-        false
-      }
-    ).render
-
-    dom.document.body.appendChild(submitButton1)
-    dom.document.body.appendChild(submitButton2)
-
-    Rx {
-      println("RX " + helloValue)
-      dom.document.body.appendChild(h1(helloValue).render)
-      dom.document.body.appendChild(h1(caseClassValue).render)
-    }
-  }*/
     val nodes = scala.Array(
-      new Task("1",Var("one"),Var((400,600))),
-      new Task("2",Var("two"),Var((1000,600))),
-      new Task("3",Var("three"),Var((400,100))),
-      new Task("4",Var("four"),Var((1000,100))),
-      new Task("5",Var("five"),Var((105,60)))
+      Graph.task("1", "one", 400, 600),
+      Graph.task("2", "two", 1000, 600),
+      Graph.task("3", "three", 400, 100),
+      Graph.task("4", "four", 1000, 100),
+      Graph.task("5", "five", 105, 60)
     )
-    val edges = scala.Array(new Edge(Var(nodes(0)),Var(nodes(1))),new Edge(Var(nodes(0)),Var(nodes(2))),new Edge(Var(nodes(3)),Var(nodes(1))))
-    val window = new Window(nodes,edges)
+    val edges = scala.Array(
+      Graph.edge(nodes(0), nodes(1)),
+      Graph.edge(nodes(0), nodes(2)),
+      Graph.edge(nodes(3), nodes(1)),
+      Graph.edge(nodes(3), nodes(2)))
+    val window = new Window(nodes, edges)
   }
 
 }

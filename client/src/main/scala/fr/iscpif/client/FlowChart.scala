@@ -19,21 +19,14 @@ package client
 
 import fr.iscpif.scaladget.d3mapping._
 
-import org.scalajs.dom.{HTMLElement, Document, Element}
-
-import org.scalajs.dom.SVGPoint
 import org.scalajs.dom
-import scalatags.JsDom.all._
-
+import shared.Api
 import scala.scalajs.js
-
-//import scala.scalajs.js._
-
 import js.Dynamic.{literal => lit, newInstance => jsnew}
-
 import rx._
-
 import fr.iscpif.scaladget.d3._
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import autowire._
 
 trait GraphElement <: EventStates {
   def literal: js.Dynamic
@@ -41,6 +34,12 @@ trait GraphElement <: EventStates {
 
 trait EventStates {
   val selected: Var[Boolean] = Var(false)
+}
+
+object Graph {
+  def task(id: String, title: String, x: Double, y: Double) = new Task(id, Var(title), Var((x, y)))
+
+  def edge(source: Task, target: Task) = new Edge(Var(source), Var(target))
 }
 
 class Task(val id: String,
@@ -96,6 +95,7 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
   val circleRoot = svgG.append("g")
 
   val mouseDownTask: Var[Option[Task]] = Var(None)
+  val dragging: Var[Boolean] = Var(false)
 
   svgSelection
     .on("mousemove", (_: js.Any, _: js.Number) => mousemove)
@@ -154,6 +154,7 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
       val x = d3.event.clientX
       val y = d3.event.clientY
       if (d3.event.shiftKey) {
+        dragging() = true
         dragLine.attr("d", "M" + t.location()._1 + "," + t.location()._2 + "L" + x + "," + y)
       }
       else {
@@ -164,7 +165,15 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
 
   def mouseup = {
     // Hide the drag line
+    if (d3.event.shiftKey && !dragging()) {
+      val (x,y) = (d3.event.clientX, d3.event.clientY)
+      Post[Api].uuid.call().foreach{ i=>
+      addTask(i, i, x, y)
+
+      }
+    }
     mouseDownTask() = None
+    dragging() = false
     dragLine
       .classed("hidden", true)
       .style("marker-end", " ")

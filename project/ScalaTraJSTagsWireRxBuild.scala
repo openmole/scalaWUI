@@ -33,7 +33,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "com.lihaoyi" %%% "upickle" % "0.2.4",
         "com.scalatags" %%% "scalatags" % "0.4.0",
         "com.scalarx" %%% "scalarx" % "0.2.6",
-        "fr.iscpif" %%% "scaladget" % "0.1.0-SNAPSHOT",
+        "fr.iscpif" %%% "scaladget" % "0.1.0",
         "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
       ),
       //jsCall := "Client().run();",
