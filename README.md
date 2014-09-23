@@ -8,6 +8,8 @@ The project aims at building a small but complete client / server application us
 - [scala.rx](https://github.com/lihaoyi/scala.rx)
 - [autowire](https://github.com/lihaoyi/autowire)
 
+as well as the [http://d3js.org/](D3.js) library.
+
 This prototype exposes a Graph editor inspired from [http://bl.ocks.org/cjrd/6863459](http://bl.ocks.org/cjrd/6863459) javascript example.
 
 ## Build & Run ##
