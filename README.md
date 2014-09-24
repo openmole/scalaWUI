@@ -25,7 +25,7 @@ Then open [http://localhost:8080/](http://localhost:8080/) in your browser.
 
 ## Play with the graph ##
 
-- drag to translate the graph
+- drag the nodes to move them
 - shift-click on graph to create a node
 - shift-click on a node and then drag to another node to connect them with a directed edge
 - click on node or edge and press delete to delete
