@@ -30,7 +30,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.3",
-        "com.lihaoyi" %%% "upickle" % "0.2.4",
+        "com.lihaoyi" %%% "upickle" % "0.2.5",
         "com.scalatags" %%% "scalatags" % "0.4.2",
         "com.scalarx" %%% "scalarx" % "0.2.6",
         "fr.iscpif" %%% "scaladget" % "0.1.0",
@@ -52,13 +52,13 @@ object ScalaTraJSTagsWireRxBuild extends Build {
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.2.3",
-        "com.lihaoyi" %% "upickle" % "0.2.4",
+        "com.lihaoyi" %% "upickle" % "0.2.5",
         "com.scalatags" %% "scalatags" % "0.4.2",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "container",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" artifacts (Artifact("javax.servlet", "jar", "jar"))
+        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" /*artifacts (Artifact("javax.servlet", "jar", "jar"))*/
       )
     )
   ).dependsOn(shared)
