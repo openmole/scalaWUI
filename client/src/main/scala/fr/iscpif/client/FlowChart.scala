@@ -20,7 +20,7 @@ package client
 import fr.iscpif.scaladget.d3mapping._
 
 import org.scalajs.dom
-import shared.Api
+import shared.oo.Api
 import scala.scalajs.js
 import js.Dynamic.{literal => lit, newInstance => jsnew}
 import rx._
