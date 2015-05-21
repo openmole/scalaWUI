@@ -5,8 +5,10 @@ import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
+import com.earldouglas.xsbtwebplugin.PluginKeys.webappResources
+import java.io.File
 
-object ScalaTraJSTagsWireRxBuild extends Build {
+object ScalaWUIBuild extends Build {
   val Organization = "fr.iscpif"
   val Name = "ScalaTraJSTagsWireRx"
   val Version = "0.1.0-SNAPSHOT"
@@ -22,7 +24,7 @@ object ScalaTraJSTagsWireRxBuild extends Build {
 
   lazy val client = Project(
     "client",
-    file("./client"),
+    file("client"),
     settings = Seq(
       version := Version,
       scalaVersion := ScalaVersion,
@@ -40,13 +42,14 @@ object ScalaTraJSTagsWireRxBuild extends Build {
 
   lazy val server = Project(
     "server",
-    file("./server"),
+    file("server"),
     settings = ScalatraPlugin.scalatraWithJRebel ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
+      webappResources in Compile := Seq(target.value / "webapp"),
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.2.5",
         "com.lihaoyi" %% "upickle" % "0.2.7",
@@ -55,8 +58,47 @@ object ScalaTraJSTagsWireRxBuild extends Build {
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "8.1.17.v20150415" % "container",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" /*artifacts (Artifact("javax.servlet", "jar", "jar"))*/
+        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test"
       )
     )
   ).dependsOn(shared)
+
+  lazy val go = taskKey[Unit]("go")
+
+  lazy val bootstrap = Project(
+    "bootstrap",
+    file("target/bootstrap"),
+    settings = Seq(
+      version := Version,
+      scalaVersion := ScalaVersion,
+      (go <<= (fullOptJS in client in Compile, resourceDirectory in client in Compile, target in server in Compile) map { (ct, r, st) =>
+        copy(ct, r, st)
+      }
+        )
+    )
+  ) dependsOn(client, server)
+
+
+  private def copy(clientTarget: Attributed[File], resources: File, serverTarget: File) = {
+    clientTarget.map { ct =>
+      recursiveCopy(new File(resources, "webapp"), new File(serverTarget.getAbsolutePath, "webapp"))
+      recursiveCopy(ct, new File(serverTarget, "webapp/js/" + ct.getName))
+    }
+  }
+
+  private def recursiveCopy(from: File, to: File): Unit = {
+    if (from.isDirectory) {
+      to.mkdirs()
+      for {
+        f ← from.listFiles()
+      } recursiveCopy(f, new File(to, f.getName))
+    }
+    else if (!to.exists() || from.lastModified() > to.lastModified) {
+      println(s"Copy file $from to $to ")
+      from.getParentFile.mkdirs
+      IO.copyFile(from, to, preserveLastModified = true)
+    }
+  }
+
+
 }

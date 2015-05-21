@@ -11,7 +11,8 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import shared._
 import upickle._
 import autowire._
-@JSExport
+
+@JSExport("Client")
 object Client {
 
   val helloValue = Var(0)
