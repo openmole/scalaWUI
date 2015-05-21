@@ -20,7 +20,7 @@ $ sbt
 > go // Build the client JS files and move them to the right place
 ```
 
-Then, start the server (in your previous sbt session):
+Then, start the server:
 ```sh
 > container:restart // Start the server
 ```
