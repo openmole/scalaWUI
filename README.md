@@ -17,16 +17,10 @@ First, build the javascript:
 ```sh
 $ cd scalaWUI
 $ sbt
-> fullOptJS // Build the client JS files
+> go // Build the client JS files and move them to the right place
 ```
 
-Then move the generated js to the scalatra webapp directory (this operation should be done automatically and in a cleaner way to avoid to move some files in the server sources ...). Nevertheless, it gives the idea in the scope of this demo project.
-
-```sh
-$ cp client/target/scala-2.11/client-opt.js server/src/main/webapp/js/
-```
-
-Finally, start the server (in your previous sbt session):
+Then, start the server (in your previous sbt session):
 ```sh
 > container:restart // Start the server
 ```
