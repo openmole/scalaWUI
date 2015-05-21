@@ -1,4 +1,4 @@
-# ScalaTraJSTagsWireRx #
+# ScalaWUI #
 
 The project aims at building a small but complete client / server application using very powerfull scala tools to construct fully typed and reactive Web applications. Among them:
 
@@ -15,7 +15,7 @@ This prototype exposes a Graph editor inspired from [http://bl.ocks.org/cjrd/686
 ## Build & Run##
 First, build the javascript:
 ```sh
-$ cd scalaTraJSTagsWireRx
+$ cd scalaWUI
 $ sbt
 > fullOptJS // Build the client JS files
 ```
