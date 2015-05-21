@@ -1,7 +1,5 @@
 package fr.iscpif.app
 
-import java.util.UUID
-
 import org.scalatra._
 import scala.concurrent.ExecutionContext.Implicits.global
 import upickle._
@@ -19,8 +17,6 @@ object AutowireServer extends autowire.Server[String, upickle.Reader, upickle.Wr
 }
 
 object ApiImpl extends Api {
-  def hello(a: Int) = a * 3
-  def caseClass = MyCaseClass("Hello !")
 }
 
 class Servlet extends ScalatraServlet {

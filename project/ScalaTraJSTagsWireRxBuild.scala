@@ -1,63 +1,60 @@
+
 import sbt._
 import Keys._
 import org.scalatra.sbt._
 import org.scalatra.sbt.PluginKeys._
-import fr.iscpif.jsmanager.JSManagerPlugin._
+import org.scalajs.sbtplugin.ScalaJSPlugin
+import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
 object ScalaTraJSTagsWireRxBuild extends Build {
   val Organization = "fr.iscpif"
   val Name = "ScalaTraJSTagsWireRx"
   val Version = "0.1.0-SNAPSHOT"
-  val ScalaVersion = "2.11.2"
+  val ScalaVersion = "2.11.6"
   val ScalatraVersion = "2.3.0"
   val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
-    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.url("scala-js-releases",
-      url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
-        Resolver.ivyStylePatterns))
+    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+  )
 
   lazy val shared = project.in(file("./shared")).settings(
     scalaVersion := ScalaVersion
-  ).settings(jsManagerSettings: _*)
+  )
 
   lazy val client = Project(
     "client",
     file("./client"),
-    settings = Defaults.defaultSettings ++ jsManagerSettings ++ Seq(
+    settings = Seq(
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %%% "autowire" % "0.2.3",
-        "com.lihaoyi" %%% "upickle" % "0.2.5",
-        "com.scalatags" %%% "scalatags" % "0.4.2",
-        "com.scalarx" %%% "scalarx" % "0.2.6",
-        "fr.iscpif" %%% "scaladget" % "0.1.0",
-        "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6"
-      ),
-      //jsCall := "Client().run();",
-      outputPath := "server/src/main/webapp/"
+        "com.lihaoyi" %%% "autowire" % "0.2.5",
+        "com.lihaoyi" %%% "upickle" % "0.2.7",
+        "com.lihaoyi" %%% "scalatags" % "0.4.6",
+        "com.lihaoyi" %%% "scalarx" % "0.2.8",
+        "fr.iscpif" %%% "scaladget" % "0.5.0-SNAPSHOT",
+        "org.scala-js" %%% "scalajs-dom" % "0.8.0"
+      )
     )
-  ).dependsOn(shared)
+  ).dependsOn(shared) enablePlugins (ScalaJSPlugin)
 
   lazy val server = Project(
     "server",
     file("./server"),
-    settings = Defaults.defaultSettings ++ ScalatraPlugin.scalatraWithJRebel ++ Seq(
+    settings = ScalatraPlugin.scalatraWithJRebel ++ Seq(
       organization := Organization,
       name := Name,
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
       libraryDependencies ++= Seq(
-        "com.lihaoyi" %% "autowire" % "0.2.3",
-        "com.lihaoyi" %% "upickle" % "0.2.5",
-        "com.scalatags" %% "scalatags" % "0.4.2",
+        "com.lihaoyi" %% "autowire" % "0.2.5",
+        "com.lihaoyi" %% "upickle" % "0.2.7",
+        "com.lihaoyi" %% "scalatags" % "0.4.6",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
-        "org.eclipse.jetty" % "jetty-webapp" % "8.1.8.v20121106" % "container",
+        "org.eclipse.jetty" % "jetty-webapp" % "8.1.17.v20150415" % "container",
         "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test" /*artifacts (Artifact("javax.servlet", "jar", "jar"))*/
       )
     )
