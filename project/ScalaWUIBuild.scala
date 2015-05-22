@@ -84,7 +84,7 @@ object ScalaWUIBuild extends Build {
   private def copy(clientTarget: Attributed[File], resources: File, webappServerTarget: File) = {
     clientTarget.map { ct =>
       recursiveCopy(new File(resources, "webapp"), webappServerTarget)
-      recursiveCopy(ct, new File(webappServerTarget, "js" + ct.getName))
+      recursiveCopy(ct, new File(webappServerTarget, "js/" + ct.getName))
     }
   }
 
