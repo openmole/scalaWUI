@@ -6,7 +6,8 @@ import org.scalatra.sbt.PluginKeys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import com.earldouglas.xsbtwebplugin.PluginKeys.webappResources
-import java.io.File
+import java.io.{File, FileOutputStream}
+import java.nio.file._
 
 object ScalaWUIBuild extends Build {
   val Organization = "fr.iscpif"
@@ -35,7 +36,8 @@ object ScalaWUIBuild extends Build {
         "com.lihaoyi" %%% "scalatags" % "0.4.6",
         "com.lihaoyi" %%% "scalarx" % "0.2.8",
         "fr.iscpif" %%% "scaladget" % "0.5.0-SNAPSHOT",
-        "org.scala-js" %%% "scalajs-dom" % "0.8.0"
+        "org.scala-js" %%% "scalajs-dom" % "0.8.0",
+        "org.webjars.bower" % "d3" % "3.5.5"
       )
     )
   ).dependsOn(shared) enablePlugins (ScalaJSPlugin)
@@ -79,10 +81,10 @@ object ScalaWUIBuild extends Build {
   ) dependsOn(client, server)
 
 
-  private def copy(clientTarget: Attributed[File], resources: File, serverTarget: File) = {
+  private def copy(clientTarget: Attributed[File], resources: File, webappServerTarget: File) = {
     clientTarget.map { ct =>
-      recursiveCopy(new File(resources, "webapp"), new File(serverTarget.getAbsolutePath, "webapp"))
-      recursiveCopy(ct, new File(serverTarget, "webapp/js/" + ct.getName))
+      recursiveCopy(new File(resources, "webapp"), webappServerTarget)
+      recursiveCopy(ct, new File(webappServerTarget, "js" + ct.getName))
     }
   }
 
@@ -99,6 +101,5 @@ object ScalaWUIBuild extends Build {
       IO.copyFile(from, to, preserveLastModified = true)
     }
   }
-
 
 }
