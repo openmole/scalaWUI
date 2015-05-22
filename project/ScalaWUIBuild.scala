@@ -74,7 +74,7 @@ object ScalaWUIBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       (go <<= (fullOptJS in client in Compile, resourceDirectory in client in Compile, target in server in Compile) map { (ct, r, st) =>
-        copy(ct, r, st)
+        copy(ct, r, new File(st,"webapp"))
       }
         )
     )
