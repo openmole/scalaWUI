@@ -1,4 +1,4 @@
-# ScalaWUI #
+# ScalaWUI (Scala Web UI)#
 
 The project aims at building a small but complete client / server application using very powerfull scala tools to construct fully typed and reactive Web applications. Among them:
 
