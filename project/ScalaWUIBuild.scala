@@ -33,11 +33,10 @@ object ScalaWUIBuild extends Build {
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
         "com.lihaoyi" %%% "upickle" % "0.2.7",
-        "com.lihaoyi" %%% "scalatags" % "0.4.6",
+        "com.lihaoyi" %%% "scalatags" % "0.5.2",
         "com.lihaoyi" %%% "scalarx" % "0.2.8",
         "fr.iscpif" %%% "scaladget" % "0.5.0-SNAPSHOT",
-        "org.scala-js" %%% "scalajs-dom" % "0.8.0",
-        "org.webjars.bower" % "d3" % "3.5.5"
+        "org.scala-js" %%% "scalajs-dom" % "0.8.0"
       )
     )
   ).dependsOn(shared) enablePlugins (ScalaJSPlugin)
@@ -55,7 +54,7 @@ object ScalaWUIBuild extends Build {
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.2.5",
         "com.lihaoyi" %% "upickle" % "0.2.7",
-        "com.lihaoyi" %% "scalatags" % "0.4.6",
+        "com.lihaoyi" %% "scalatags" % "0.5.2",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
