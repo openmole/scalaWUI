@@ -29,7 +29,7 @@ object ScalaWUIBuild extends Build {
     settings = Seq(
       version := Version,
       scalaVersion := ScalaVersion,
-      resolvers ++= Resolvers,
+      resolvers in ThisBuild ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
         "com.lihaoyi" %%% "upickle" % "0.2.7",
