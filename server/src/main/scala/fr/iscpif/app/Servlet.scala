@@ -2,7 +2,7 @@ package fr.iscpif.app
 
 import org.scalatra._
 import scala.concurrent.ExecutionContext.Implicits.global
-import upickle._
+import upickle.default
 import autowire._
 import shared._
 import upickle._
@@ -11,12 +11,12 @@ import scala.concurrent.Await
 import scalatags.Text.all._
 import scalatags.Text.{all => tags}
 
-object AutowireServer extends autowire.Server[String, upickle.Reader, upickle.Writer] {
-  def read[Result: upickle.Reader](p: String) = upickle.read[Result](p)
-  def write[Result: upickle.Writer](r: Result) = upickle.write(r)
+object AutowireServer extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer] {
+  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
-object ApiImpl extends Api {
+object ApiImpl extends shared.Api {
 }
 
 class Servlet extends ScalatraServlet {
@@ -38,9 +38,9 @@ class Servlet extends ScalatraServlet {
   }
 
   post(s"/$basePath/*") {
-    Await.result(AutowireServer.route[Api](ApiImpl)(
+    Await.result(AutowireServer.route[shared.Api](ApiImpl)(
       autowire.Core.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
-        upickle.read[Map[String, String]](request.body))
+        upickle.default.read[Map[String, String]](request.body))
     ), Duration.Inf)
   }
 

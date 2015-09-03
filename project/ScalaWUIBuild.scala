@@ -2,18 +2,16 @@
 import sbt._
 import Keys._
 import org.scalatra.sbt._
-import org.scalatra.sbt.PluginKeys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 import com.earldouglas.xsbtwebplugin.PluginKeys.webappResources
-import java.io.{File, FileOutputStream}
-import java.nio.file._
+import java.io.File
 
 object ScalaWUIBuild extends Build {
   val Organization = "fr.iscpif"
   val Name = "ScalaTraJSTagsWireRx"
   val Version = "0.1.0-SNAPSHOT"
-  val ScalaVersion = "2.11.6"
+  val ScalaVersion = "2.11.7"
   val ScalatraVersion = "2.3.0"
   val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
     "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
@@ -32,10 +30,10 @@ object ScalaWUIBuild extends Build {
       resolvers in ThisBuild ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
-        "com.lihaoyi" %%% "upickle" % "0.2.7",
+        "com.lihaoyi" %%% "upickle" % "0.3.6",
         "com.lihaoyi" %%% "scalatags" % "0.5.2",
         "com.lihaoyi" %%% "scalarx" % "0.2.8",
-        "fr.iscpif" %%% "scaladget" % "0.5.0-SNAPSHOT",
+        "fr.iscpif" %%% "scaladget" % "0.7.0",
         "org.scala-js" %%% "scalajs-dom" % "0.8.0"
       )
     )
@@ -53,7 +51,7 @@ object ScalaWUIBuild extends Build {
       webappResources in Compile := Seq(target.value / "webapp"),
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.2.5",
-        "com.lihaoyi" %% "upickle" % "0.2.7",
+        "com.lihaoyi" %% "upickle" % "0.3.6",
         "com.lihaoyi" %% "scalatags" % "0.5.2",
         "org.scalatra" %% "scalatra" % ScalatraVersion,
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
