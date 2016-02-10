@@ -4,15 +4,18 @@ import Keys._
 import org.scalatra.sbt._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
-import com.earldouglas.xsbtwebplugin.PluginKeys.webappResources
+import com.earldouglas.xwp._
 import java.io.File
 
 object ScalaWUIBuild extends Build {
   val Organization = "fr.iscpif"
-  val Name = "ScalaTraJSTagsWireRx"
+  val Name = "ScalaWUI"
   val Version = "0.1.0-SNAPSHOT"
   val ScalaVersion = "2.11.7"
-  val ScalatraVersion = "2.3.0"
+  val scalatraVersion = "2.4.0"
+  val jettyVersion = "9.3.7.v20160115"
+  val json4sVersion = "3.3.0"
+  val scalatagsVersion = "0.5.4"
   val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
     "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
   )
@@ -30,11 +33,12 @@ object ScalaWUIBuild extends Build {
       resolvers in ThisBuild ++= Resolvers,
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
-        "com.lihaoyi" %%% "upickle" % "0.3.6",
-        "com.lihaoyi" %%% "scalatags" % "0.5.2",
-        "com.lihaoyi" %%% "scalarx" % "0.2.8",
-        "fr.iscpif" %%% "scaladget" % "0.7.0",
-        "org.scala-js" %%% "scalajs-dom" % "0.8.0"
+        "com.lihaoyi" %%% "upickle" % "0.3.8",
+        "com.lihaoyi" %%% "scalatags" % scalatagsVersion,
+        "com.lihaoyi" %%% "scalarx" % "0.2.9",
+        "fr.iscpif" %%% "scaladget" % "0.8.0-SNAPSHOT",
+        "org.scala-js" %%% "scalajs-dom" % "0.8.2",
+        "org.json4s" %% "json4s-jackson" % json4sVersion
       )
     )
   ).dependsOn(shared) enablePlugins (ScalaJSPlugin)
@@ -48,19 +52,17 @@ object ScalaWUIBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers ++= Resolvers,
-      webappResources in Compile := Seq(target.value / "webapp"),
       libraryDependencies ++= Seq(
         "com.lihaoyi" %% "autowire" % "0.2.5",
-        "com.lihaoyi" %% "upickle" % "0.3.6",
-        "com.lihaoyi" %% "scalatags" % "0.5.2",
-        "org.scalatra" %% "scalatra" % ScalatraVersion,
-        "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
-        "ch.qos.logback" % "logback-classic" % "1.0.12" % "runtime",
-        "org.eclipse.jetty" % "jetty-webapp" % "8.1.17.v20150415" % "container",
-        "org.eclipse.jetty.orbit" % "javax.servlet" % "3.0.0.v201112011016" % "container;provided;test"
+        "com.lihaoyi" %% "upickle" % "0.3.8",
+        "com.lihaoyi" %% "scalatags" % scalatagsVersion,
+        "org.scalatra" %% "scalatra" % scalatraVersion,
+        "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
+        "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
+        "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "container"
       )
     )
-  ).dependsOn(shared)
+  ).dependsOn(shared) enablePlugins (JettyPlugin)
 
   lazy val go = taskKey[Unit]("go")
 
@@ -71,7 +73,7 @@ object ScalaWUIBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       (go <<= (fullOptJS in client in Compile, resourceDirectory in client in Compile, target in server in Compile) map { (ct, r, st) =>
-        copy(ct, r, new File(st,"webapp"))
+        copy(ct, r, new File(st, "webapp"))
       }
         )
     )
