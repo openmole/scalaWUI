@@ -22,7 +22,7 @@ $ sbt
 
 Then, start the server:
 ```sh
-> container:restart // Start the server
+> jetty:start // Start the server
 ```
 
 ## Play with the graph ##
