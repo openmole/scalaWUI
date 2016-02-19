@@ -10,6 +10,7 @@ import scala.concurrent.duration._
 import scala.concurrent.Await
 import scalatags.Text.all._
 import scalatags.Text.{all => tags}
+import fr.iscpif.ext.Data._
 
 object AutowireServer extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer] {
   def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
@@ -17,6 +18,8 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
 }
 
 object ApiImpl extends shared.Api {
+
+  def runningData(i: Int) = RunningData(Seq(RunningEnvironmentData(ExecutionId(), Seq())), Seq(RunningOutputData(ExecutionId(), "nrstrnstie"))))
 }
 
 class Servlet extends ScalatraServlet {

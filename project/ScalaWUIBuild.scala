@@ -22,7 +22,17 @@ object ScalaWUIBuild extends Build {
 
   lazy val shared = project.in(file("./shared")).settings(
     scalaVersion := ScalaVersion
-  )
+  ).dependsOn(ext)
+
+  lazy val ext = Project(
+    "ext",
+    file("ext"),
+    settings = Seq(
+      version := Version,
+      scalaVersion := ScalaVersion,
+      resolvers ++= Resolvers
+    )
+  ) enablePlugins (ScalaJSPlugin)
 
   lazy val client = Project(
     "client",
@@ -41,7 +51,7 @@ object ScalaWUIBuild extends Build {
         "org.json4s" %% "json4s-jackson" % json4sVersion
       )
     )
-  ).dependsOn(shared) enablePlugins (ScalaJSPlugin)
+  ).dependsOn(shared, ext) enablePlugins (ScalaJSPlugin)
 
   lazy val server = Project(
     "server",
@@ -62,7 +72,7 @@ object ScalaWUIBuild extends Build {
         "org.eclipse.jetty" % "jetty-webapp" % jettyVersion % "container"
       )
     )
-  ).dependsOn(shared) enablePlugins (JettyPlugin)
+  ).dependsOn(shared, ext) enablePlugins (JettyPlugin)
 
   lazy val go = taskKey[Unit]("go")
 

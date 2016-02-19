@@ -1,14 +1,13 @@
 package client
 
+import fr.iscpif.ext.Data.RunningData
 import org.scalajs.dom
 import scala.concurrent.Future
+import scala.util.Success
 import scalatags.JsDom._
-import all._
-import tags2.section
 import rx._
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
-import shared._
 import upickle._
 import autowire._
 
@@ -33,6 +32,10 @@ object Client {
       Graph.edge(nodes(3), nodes(1)),
       Graph.edge(nodes(3), nodes(2)))
     val window = new Window(nodes, edges)
+
+    Post[shared.Api].runningData(4).call().foreach {b=>
+      println("B : " + b.environmentsData)
+    }
   }
 
 }
