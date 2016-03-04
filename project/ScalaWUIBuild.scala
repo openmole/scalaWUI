@@ -31,6 +31,7 @@ object ScalaWUIBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers in ThisBuild ++= Resolvers,
+      jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
         "com.lihaoyi" %%% "upickle" % "0.3.8",
@@ -82,8 +83,10 @@ object ScalaWUIBuild extends Build {
 
   private def copy(clientTarget: Attributed[File], resources: File, webappServerTarget: File) = {
     clientTarget.map { ct =>
+      val depName = ct.getName.replace("opt.js", "jsdeps.min.js")
       recursiveCopy(new File(resources, "webapp"), webappServerTarget)
       recursiveCopy(ct, new File(webappServerTarget, "js/" + ct.getName))
+      recursiveCopy(new File(ct.getParent, depName), new File(webappServerTarget, "js/" + depName))
     }
   }
 
