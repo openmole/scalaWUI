@@ -31,6 +31,7 @@ object ScalaWUIBuild extends Build {
       version := Version,
       scalaVersion := ScalaVersion,
       resolvers in ThisBuild ++= Resolvers,
+      skip in packageJSDependencies := false,
       jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
