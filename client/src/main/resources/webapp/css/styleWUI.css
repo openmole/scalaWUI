@@ -1,3 +1,7 @@
+@font-face{
+    font-family:'Glyphicons Halflings';
+    src:url(../fonts/glyphicons-halflings-regular.eot);
+}
 
 body{
     margin: 0;
@@ -98,3 +102,4 @@ path.link.hidden{
 path.link.selected {
     stroke: rgb(229, 172, 247);
 }
+

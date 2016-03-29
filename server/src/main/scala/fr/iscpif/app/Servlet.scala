@@ -30,8 +30,10 @@ class Servlet extends ScalatraServlet {
       tags.head(
         tags.meta(tags.httpEquiv := "Content-Type", tags.content := "text/html; charset=UTF-8"),
         tags.link(tags.rel := "stylesheet", tags.`type` := "text/css", href := "css/styleWUI.css"),
-        tags.script(tags.`type` := "text/javascript", tags.src := "js/client-opt.js"),
-        tags.script(tags.`type` := "text/javascript", tags.src := "js/client-jsdeps.min.js")
+        tags.link(tags.rel := "stylesheet", tags.`type` := "text/css", href := "css/taglibrary.css"),
+        tags.link(tags.rel := "stylesheet", tags.`type` := "text/css", href := "css/bootstrap.min.css"),
+        tags.script(tags.`type` := "text/javascript", tags.src := "js/client-jsdeps.min.js"),
+        tags.script(tags.`type` := "text/javascript", tags.src := "js/client-opt.js")
       ),
       tags.body(tags.onload := "Client().run();")
     )

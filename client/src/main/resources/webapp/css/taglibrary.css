@@ -1,0 +1,21 @@
+.stringInGroup{
+    height: 28px;
+    padding-top: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.sortingBar{
+    width: 100%;
+    right: -149px;
+    top: 15px;
+}
+
+.twoGlyphButton{
+    top: 1px;
+    height: 30px;
+}
+
+.left3{
+    left: 3px;
+}

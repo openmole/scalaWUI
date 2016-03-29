@@ -1,5 +1,6 @@
 package client
 
+import fr.iscpif.client.BootstrapDemo
 import org.scalajs.dom
 import scala.concurrent.Future
 import scalatags.JsDom._
@@ -8,19 +9,22 @@ import tags2.section
 import rx._
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import fr.iscpif.scaladget.api.{BootstrapTags ⇒ bs}
+import bs._
 import shared._
 import upickle._
 import autowire._
+import client.JsRxTags._
 
 @JSExport("Client")
 object Client {
 
-  val helloValue = Var(0)
-  val caseClassValue = Var("empty")
 
   @JSExport
   def run() {
-    val nodes = scala.Array(
+
+    // SVG
+   /* val nodes = scala.Array(
       Graph.task("1", "one", 400, 600),
       Graph.task("2", "two", 1000, 600),
       Graph.task("3", "three", 400, 100),
@@ -32,7 +36,14 @@ object Client {
       Graph.edge(nodes(0), nodes(2)),
       Graph.edge(nodes(3), nodes(1)),
       Graph.edge(nodes(3), nodes(2)))
-    val window = new Window(nodes, edges)
+    val window = new Window(nodes, edges)*/
+
+    //BOOSTRAP
+    val a = BootstrapDemo.build.render
+
+    println("A " + a)
+
+    dom.document.body.appendChild(a)
   }
 
 }

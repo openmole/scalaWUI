@@ -16,6 +16,7 @@ object ScalaWUIBuild extends Build {
   val jettyVersion = "9.3.7.v20160115"
   val json4sVersion = "3.3.0"
   val scalatagsVersion = "0.5.4"
+  val jqueryVersion = "2.2.1"
   val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
     "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
   )
@@ -23,6 +24,7 @@ object ScalaWUIBuild extends Build {
   lazy val shared = project.in(file("./shared")).settings(
     scalaVersion := ScalaVersion
   )
+  val jqueryPath = s"META-INF/resources/webjars/jquery/$jqueryVersion/jquery.js"
 
   lazy val client = Project(
     "client",
@@ -32,7 +34,11 @@ object ScalaWUIBuild extends Build {
       scalaVersion := ScalaVersion,
       resolvers in ThisBuild ++= Resolvers,
       skip in packageJSDependencies := false,
-      jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
+      //jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
+      //jsDependencies += "org.webjars" % "jquery" % "2.2.1" / "jquery.js",
+      jsDependencies += "org.webjars" % "jquery" % jqueryVersion / jqueryPath minified jqueryPath.replace(".js", ".min.js"),
+      jsDependencies += "org.webjars" % "bootstrap" % "3.3.6" / "js/bootstrap.js" dependsOn jqueryPath minified "js/bootstrap.min.js",
+    //  jsDependencies += "org.webjars" % "bootstrap" % "3.3.6" / "js/bootstrap.min.js",
       libraryDependencies ++= Seq(
         "com.lihaoyi" %%% "autowire" % "0.2.5",
         "com.lihaoyi" %%% "upickle" % "0.3.8",
