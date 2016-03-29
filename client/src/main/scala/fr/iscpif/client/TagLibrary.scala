@@ -3,7 +3,7 @@ package fr.iscpif.client
 
 import org.scalajs.dom.raw._
 import scalatags.JsDom.all._
-import scalatags.JsDom.TypedTag
+import scalatags.JsDom.{tags, TypedTag}
 import fr.iscpif.scaladget.api._
 import fr.iscpif.scaladget.api.{BootstrapTags ⇒ bs}
 import client.JsRxTags._
@@ -125,7 +125,7 @@ object TagLibrary {
 
     def buttonBackground(b: ExclusiveButton) = if (b == selected()) selectionCKA else btn_default
 
-    val div: HTMLElement = Rx {
+    val div: Modifier = Rx {
       bs.div(keys + "btn-group")(
         for (b ← buttons) yield {
           b match {
@@ -149,4 +149,25 @@ object TagLibrary {
     def reset = selected() = buttons.head
   }
 
+
+  ///Input field hidden by a span and discoverd when clicking
+  class HiddenInput(label: String, pHolder: String, onSubmit: () => Unit) {
+    val inputVisible: Var[Boolean] = Var(false)
+
+    private val button = bs.button(label)(onclick := { () => inputVisible() = true })
+
+    private val input = bs.form("")(
+      tags.input(placeholder := pHolder),
+      onsubmit := { () =>
+        onSubmit()
+        false
+      }
+    )
+
+    val div = Rx {
+      if (inputVisible()) input else button
+    }
+  }
+
+  def hiddenInput(label: String, pHolder: String, onSubmit: () => Unit): Modifier = (new HiddenInput(label, pHolder, onSubmit)).div
 }

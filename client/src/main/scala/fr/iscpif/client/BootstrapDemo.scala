@@ -3,8 +3,8 @@ package fr.iscpif.client
 
 import TagLibrary._
 import fr.iscpif.scaladget.api.BootstrapTags._
-
 import scala.scalajs.js.annotation.JSExport
+import scalatags.JsDom.tags
 
 /*
  * Copyright (C) 24/03/16 // mathieu.leclaire@openmole.org
@@ -25,7 +25,9 @@ import scala.scalajs.js.annotation.JSExport
 
 object BootstrapDemo {
 
-  def build = buttonGroupExclusive("sortingBar", btn_default)(
+  def build = tags.div(
+    hiddenInput("#", "myInput", ()=> println("Yo men")),
+    buttonGroupExclusive("sortingBar", btn_default)(
     ExclusiveButton.twoGlyphStates(
       glyph_triangle_bottom + " left3",
       glyph_triangle_top,
@@ -50,6 +52,7 @@ object BootstrapDemo {
       key("twoGlyphButton")
     )
   ).div
+  )
 
 
 }
