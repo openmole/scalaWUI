@@ -5,6 +5,7 @@ import TagLibrary._
 import fr.iscpif.scaladget.api.BootstrapTags._
 import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom.tags
+import client.JsRxTags._
 
 /*
  * Copyright (C) 24/03/16 // mathieu.leclaire@openmole.org
@@ -26,31 +27,30 @@ import scalatags.JsDom.tags
 object BootstrapDemo {
 
   def build = tags.div(
-    hiddenInput("#", "myInput", ()=> println("Yo men")),
-    buttonGroupExclusive("sortingBar", btn_default)(
+    buttonGroupExclusive("sortingBar", key("selecteButton"))(
     ExclusiveButton.twoGlyphStates(
       glyph_triangle_bottom + " left3",
       glyph_triangle_top,
       () ⇒ println("state 1"),
       () ⇒ println("state 2"),
-      "Aa",
-      key("twoGlyphButton")
+      preString = "Aa"
     ),
     ExclusiveButton.twoGlyphStates(
       glyph_triangle_bottom + " left3",
       glyph_triangle_top,
       () ⇒ println("state 1"),
       () ⇒ println("state 2"),
-      preGlyph = key("twoGlyphButton") + glyph_time
+      preGlyph = glyph_time
     ),
     ExclusiveButton.twoGlyphStates(
       glyph_triangle_bottom + " left3",
       glyph_triangle_top,
       () ⇒ println("state 1"),
       () ⇒ println("state 2"),
-      preString = "Ko",
-      key("twoGlyphButton")
-    )
+      preString = "Ko"
+    ),
+    ExclusiveButton.string("#", ()=> println("Yo #")),
+    ExclusiveButton.string("Name", ()=> println("Yo name"))
   ).div
   )
 

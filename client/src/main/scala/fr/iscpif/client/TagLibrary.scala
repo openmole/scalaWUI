@@ -73,6 +73,10 @@ object TagLibrary {
     def title: String
   }
 
+  trait ExclusiveDiv extends ExclusiveButton {
+    def div: Modifier
+  }
+
   case class TwoStatesGlyphButton(glyph: ClassKeyAggregator,
                                   glyph2: ClassKeyAggregator,
                                   action: () ⇒ Unit,
@@ -83,7 +87,7 @@ object TagLibrary {
     val selected = Var(glyph)
 
     val div: Modifier = Rx {
-      glyphButton(preString, key("left5") + btn_default + preGlyph, selected(), () ⇒ {
+      glyphButton(preString, key("left5") + preGlyph, selected(), () ⇒ {
         if (selected() == glyph) {
           selected() = glyph2
           action2()
@@ -123,7 +127,7 @@ object TagLibrary {
   class ExclusiveGroup(keys: ClassKeyAggregator, selectionCKA: ClassKeyAggregator, buttons: Seq[ExclusiveButton]) {
     val selected = Var(buttons.head)
 
-    def buttonBackground(b: ExclusiveButton) = if (b == selected()) selectionCKA else btn_default
+    def buttonBackground(b: ExclusiveButton) = (if (b == selected()) selectionCKA else btn_default) + "twoGlyphButton"
 
     val div: Modifier = Rx {
       bs.div(keys + "btn-group")(
@@ -131,9 +135,7 @@ object TagLibrary {
           b match {
             case s: ExclusiveStringButton ⇒ bs.button(s.title, buttonBackground(s) + "stringInGroup", action(b, s.action))
             case g: ExclusiveGlyphButton ⇒ bs.glyphButton("", buttonBackground(g), g.glyph, action(b, g.action))
-            case ts: TwoStatesGlyphButton ⇒
-              println("UUU -> " + ts.selected() + " // " + ts.glyph + " // " + ts.glyph2)
-              twoStatesGlyphButton(ts.glyph, ts.glyph2, action(ts, ts.action), action(ts, ts.action2), ts.preString, buttonBackground(ts) + ts.preGlyph).div
+            case ts: TwoStatesGlyphButton ⇒ twoStatesGlyphButton(ts.glyph, ts.glyph2, action(ts, ts.action), action(ts, ts.action2), ts.preString, buttonBackground(ts) + ts.preGlyph).div
             case _ ⇒ bs.button("??")
           }
         }

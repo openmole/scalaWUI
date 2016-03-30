@@ -19,3 +19,12 @@
 .left3{
     left: 3px;
 }
+
+.width50{
+    margin-top: 2px;
+    width: 50px;
+}
+
+.selecteButton{
+    background-color: #e3dbdb;
+}
