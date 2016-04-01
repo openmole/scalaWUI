@@ -1,11 +1,13 @@
 package fr.iscpif.client
 
 
-import TagLibrary._
 import fr.iscpif.scaladget.api.BootstrapTags._
-import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom.tags
-import client.JsRxTags._
+import scalatags.JsDom.all._
+import fr.iscpif.scaladget.stylesheet._
+import fr.iscpif.scaladget.stylesheet.{bootstrap => bs, bootstrap2}
+import scalatags.JsDom.{styles => sty}
+import bs._
 
 /*
  * Copyright (C) 24/03/16 // mathieu.leclaire@openmole.org
@@ -26,33 +28,39 @@ import client.JsRxTags._
 
 object BootstrapDemo {
 
-  def build = tags.div(
-    buttonGroupExclusive("sortingBar", key("selecteButton"))(
-    ExclusiveButton.twoGlyphStates(
-      glyph_triangle_bottom + " left3",
-      glyph_triangle_top,
-      () ⇒ println("state 1"),
-      () ⇒ println("state 2"),
-      preString = "Aa"
-    ),
-    ExclusiveButton.twoGlyphStates(
-      glyph_triangle_bottom + " left3",
-      glyph_triangle_top,
-      () ⇒ println("state 1"),
-      () ⇒ println("state 2"),
-      preGlyph = glyph_time
-    ),
-    ExclusiveButton.twoGlyphStates(
-      glyph_triangle_bottom + " left3",
-      glyph_triangle_top,
-      () ⇒ println("state 1"),
-      () ⇒ println("state 2"),
-      preString = "Ko"
-    ),
-    ExclusiveButton.string("#", ()=> println("Yo #")),
-    ExclusiveButton.string("Name", ()=> println("Yo name"))
-  ).div
-  )
+
+  def build = {
+    val bottom = glyph_triangle_bottom +++ (sty.left := "3px")
+    tags.div(
+      sty.left := "40px",
+      sty.width := "100%",
+      exclusiveButtonGroup(bootstrap2.sortingBar, stylesheet.selectedButton)(
+        ExclusiveButton.twoGlyphStates(
+          bottom,
+          glyph_triangle_top,
+          () ⇒ println("state 1"),
+          () ⇒ println("state 2"),
+          preString = "Aa"
+        ),
+        ExclusiveButton.twoGlyphStates(
+          bottom,
+          glyph_triangle_top,
+          () ⇒ println("state 1"),
+          () ⇒ println("state 2"),
+          preGlyph = glyph_time
+        ),
+        ExclusiveButton.twoGlyphStates(
+          bottom,
+          glyph_triangle_top,
+          () ⇒ println("state 1"),
+          () ⇒ println("state 2"),
+          preString = "Ko"
+        ),
+        ExclusiveButton.string("#", () => println("Yo #")),
+        ExclusiveButton.string("Name", () => println("Yo name"))
+      ).div
+    )
+  }
 
 
 }
