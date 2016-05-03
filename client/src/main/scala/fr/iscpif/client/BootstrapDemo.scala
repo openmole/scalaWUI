@@ -75,7 +75,7 @@ object BootstrapDemo {
           )
         )
       ),
-      span("Settings")(btn_primary).popup(inner, popupStyle = defaultWhitePopupWithBorder, arrowStyle = arrow("pink", Up)),
+      span("Settings")(btn_primary).popup(inner, popupStyle = defaultWhitePopupWithBorder, arrowStyle = whiteUpArrow),
       tags.label("nrestiarn")(ms("oo") +++ toto),
       sel.selector,
       span(glyph_trash),

@@ -28,21 +28,21 @@ import rx._
 
 object PopupDiv {
 
-  trait Direction
+  trait PopupPosition
 
-  object Left extends Direction
+  //object Left extends PopupPosition
 
-  object Right extends Direction
+  object Right extends PopupPosition
 
-  object Up extends Direction
+  //object Top extends PopupPosition
 
-  object Down extends Direction
+  object Bottom extends PopupPosition
 
 
   implicit class PopableHtmlElement(element: org.scalajs.dom.raw.HTMLElement) {
 
     def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-              position: Direction = Up,
+              position: PopupPosition = Bottom,
               popupStyle: ModifierSeq = whitePopup,
               arrowStyle: ModifierSeq = noArrow) = {
       val pop = new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle)
@@ -52,17 +52,17 @@ object PopupDiv {
 
   implicit class PopableTypedTag(element: TypedTag[org.scalajs.dom.raw.HTMLElement]) {
     def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-              position: Direction = Up,
+              position: PopupPosition = Bottom,
               popupStyle: ModifierSeq = whitePopup,
-              arrowStyle: ModifierSeq = whiteUpArrow) = new PopableHtmlElement(element.render).popup(innerDiv, position, popupStyle, arrowStyle)
+              arrowStyle: ModifierSeq = noArrow) = new PopableHtmlElement(element.render).popup(innerDiv, position, popupStyle, arrowStyle)
   }
 
   lazy val noArrow: ModifierSeq = Seq()
-  lazy val whiteUpArrow = arrow("white", Up)
+  lazy val whiteUpArrow = arrow("white", Bottom)
 
   lazy val whitePopup: ModifierSeq = Seq(
     all.absolutePosition,
-    display := "block",
+    display := "inline-block",
     width := "auto",
     maxWidth := 200,
     height := "auto",
@@ -77,14 +77,14 @@ object PopupDiv {
     whitePopup +++ (borderBottom := "0.1em solid #ccc")
 
 
-  def arrow(color: String, position: Direction): ModifierSeq = {
+  def arrow(color: String, position: PopupPosition): ModifierSeq = {
     val transparent = "5px solid transparent"
     val solid = s"5px solid $color"
     Seq(
       width := 0,
       height := 0) ++ {
       position match {
-        case Up => Seq(
+        case Bottom => Seq(
           borderLeft := transparent,
           borderRight := transparent,
           borderBottom := solid)
@@ -92,14 +92,6 @@ object PopupDiv {
           borderTop := transparent,
           borderBottom := transparent,
           borderLeft := solid)
-        case Left => Seq(
-          borderTop := transparent,
-          borderBottom := transparent,
-          borderRight := solid)
-        case Down => Seq(
-          borderLeft := transparent,
-          borderRight := transparent,
-          borderTop := solid)
       }
     }
   }
@@ -107,9 +99,10 @@ object PopupDiv {
 }
 
 import PopupDiv._
+
 class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
                   innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-                  position: Direction,
+                  direction: PopupPosition,
                   popupStyle: ModifierSeq,
                   arrowStyle: ModifierSeq) {
 
@@ -124,14 +117,13 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
     all.marginLeft((triggerElement.offsetWidth / 2 - 3).toInt)
   )
 
-
   triggerElement.style.setProperty("cursor", "pointer")
 
   lazy val mainDiv = div(arrowStyle +++ arrowPosition)(
     innerDiv(popupStyle +++ popupPosition)
   ).render
 
-  lazy val popup = div(
+  val popup = div(relativePosition)(
     triggerElement,
     Rx {
       if (popupVisible()) mainDiv
