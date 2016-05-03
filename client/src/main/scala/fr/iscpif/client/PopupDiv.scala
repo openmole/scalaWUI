@@ -44,8 +44,9 @@ object PopupDiv {
     def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
               position: PopupPosition = Bottom,
               popupStyle: ModifierSeq = whitePopup,
-              arrowStyle: ModifierSeq = noArrow) = {
-      val pop = new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle)
+              arrowStyle: ModifierSeq = noArrow,
+              onclose: () => Unit = () => {}) = {
+      val pop = new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle, onclose)
       org.scalajs.dom.document.body.appendChild(pop.popup.render)
     }
   }
@@ -54,7 +55,9 @@ object PopupDiv {
     def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
               position: PopupPosition = Bottom,
               popupStyle: ModifierSeq = whitePopup,
-              arrowStyle: ModifierSeq = noArrow) = new PopableHtmlElement(element.render).popup(innerDiv, position, popupStyle, arrowStyle)
+              arrowStyle: ModifierSeq = noArrow,
+              onclose: () => Unit = () => {}) =
+      new PopableHtmlElement(element.render).popup(innerDiv, position, popupStyle, arrowStyle, onclose)
   }
 
   lazy val noArrow: ModifierSeq = Seq()
@@ -107,9 +110,14 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
                   innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
                   direction: PopupPosition,
                   popupStyle: ModifierSeq,
-                  arrowStyle: ModifierSeq) {
+                  arrowStyle: ModifierSeq,
+                  onclose: ()=> Unit) {
 
   val popupVisible = Var(false)
+
+  Obs(popupVisible){
+    if (!popupVisible()) onclose()
+  }
 
   lazy val popupPosition: ModifierSeq = direction match {
     case Bottom => Seq(
