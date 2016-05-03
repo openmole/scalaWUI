@@ -28,7 +28,7 @@ import rx._
 
 object PopupDiv {
 
-  trait PopupPosition
+  sealed trait PopupPosition
 
   //object Left extends PopupPosition
 
@@ -58,7 +58,10 @@ object PopupDiv {
   }
 
   lazy val noArrow: ModifierSeq = Seq()
-  lazy val whiteUpArrow = arrow("white", Bottom)
+  lazy val whiteBottomArrow = arrow("white", Bottom)
+  lazy val whiteRightArrow = arrow("white", Right)
+  lazy val greyBottomArrow = arrow("#333", Bottom)
+  lazy val greyRightArrow = arrow("#333", Right)
 
   lazy val whitePopup: ModifierSeq = Seq(
     all.absolutePosition,
@@ -73,8 +76,8 @@ object PopupDiv {
     boxShadow := "0 8px 6px -6px black"
   )
 
-  lazy val defaultWhitePopupWithBorder: ModifierSeq =
-    whitePopup +++ (borderBottom := "0.1em solid #ccc")
+  lazy val whitePopupWithBorder: ModifierSeq =
+    whitePopup +++ (border := "0.1em solid #ccc")
 
 
   def arrow(color: String, position: PopupPosition): ModifierSeq = {
@@ -91,7 +94,7 @@ object PopupDiv {
         case Right => Seq(
           borderTop := transparent,
           borderBottom := transparent,
-          borderLeft := solid)
+          borderRight := solid)
       }
     }
   }
@@ -108,14 +111,26 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
 
   val popupVisible = Var(false)
 
-  lazy val popupPosition: ModifierSeq = Seq(
-    left := triggerElement.offsetLeft - innerDiv.render.clientWidth / 2,
-    top := triggerElement.offsetTop + triggerElement.offsetHeight + 5
-  )
+  lazy val popupPosition: ModifierSeq = direction match {
+    case Bottom => Seq(
+      left := triggerElement.offsetLeft,
+      top := triggerElement.offsetTop + triggerElement.offsetHeight + 5
+    )
 
-  lazy val arrowPosition: ModifierSeq = Seq(
-    all.marginLeft((triggerElement.offsetWidth / 2 - 3).toInt)
-  )
+    case Right => Seq(
+      left := triggerElement.offsetLeft + triggerElement.offsetWidth + 5,
+      top := -triggerElement.offsetHeight / 2
+    )
+  }
+
+
+  lazy val arrowPosition: ModifierSeq = direction match {
+    case Bottom => all.marginLeft((triggerElement.offsetWidth / 2 - 3 + triggerElement.offsetLeft).toInt)
+    case Right => Seq(
+      all.marginLeft((triggerElement.offsetLeft + triggerElement.offsetWidth).toInt),
+      all.marginTop(-(triggerElement.offsetTop + triggerElement.offsetHeight / 2 + 1).toInt)
+    )
+  }
 
   triggerElement.style.setProperty("cursor", "pointer")
 

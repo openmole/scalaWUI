@@ -75,7 +75,7 @@ object BootstrapDemo {
           )
         )
       ),
-      span("Settings")(btn_primary).popup(inner, popupStyle = defaultWhitePopupWithBorder, arrowStyle = whiteUpArrow),
+      span("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = whiteRightArrow),
       tags.label("nrestiarn")(ms("oo") +++ toto),
       sel.selector,
       span(glyph_trash),
