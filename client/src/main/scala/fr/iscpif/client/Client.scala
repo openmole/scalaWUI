@@ -1,6 +1,6 @@
 package client
 
-import fr.iscpif.client.BootstrapDemo
+import fr.iscpif.client.{Test, BootstrapDemo}
 import fr.iscpif.scaladget.stylesheet.bootstrap
 import org.scalajs.dom
 import scala.concurrent.Future
@@ -25,6 +25,7 @@ object Client {
   @JSExport
   def run() {
     dom.document.body.appendChild(BootstrapDemo.build)
+    dom.document.body.appendChild(Test.build)
   }
 
 }

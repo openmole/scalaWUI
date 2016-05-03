@@ -35,7 +35,7 @@ class Servlet extends ScalatraServlet {
         tags.script(tags.`type` := "text/javascript", tags.src := "js/client-jsdeps.min.js"),
         tags.script(tags.`type` := "text/javascript", tags.src := "js/client-opt.js")
       ),
-      tags.body(tags.onload := "Client().run();")
+      tags.body(`class` := "uu", tags.onload := "Client().run();")
     )
   }
 

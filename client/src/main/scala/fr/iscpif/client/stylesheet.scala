@@ -17,13 +17,19 @@ package fr.iscpif.client
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fr.iscpif.scaladget.stylesheet._
+import fr.iscpif.scaladget.stylesheet.all._
 import scalatags.JsDom.{styles => sty}
 import scalatags.JsDom.all._
 
 package object stylesheet {
-    def selectedButton: ModifierSeq = Seq(
-      bootstrap.btn,
-      sty.backgroundColor := "#e3dbdb;"
-    )
+  lazy val selectedButton: ModifierSeq = Seq(
+    btn,
+    sty.backgroundColor := "#e3dbdb;"
+  )
+
+  lazy val toto: ModifierSeq = Seq(
+    position := "absolute",
+    sty.top := 200,
+    color := "green"
+  )
 }

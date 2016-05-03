@@ -28,3 +28,46 @@
 .selecteButton{
     background-color: #e3dbdb;
 }
+
+.oo{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 250px;
+    transform: translate(-50%, -50%);
+}
+
+.oo:hover{
+    color: red;
+}
+
+.uu{
+background-color: #333;
+height : = 400px;
+}
+
+.iii{
+    color: white;
+    background-color: #333;
+    opacity: 0.5;
+}
+
+.iii.btn:hover{
+    color: white;
+    background-color: #333;
+    opacity: 1;
+}
+
+.yyy.btn, .yyy.btn:hover{
+    color: white;
+    background-color: #333;
+    opacity: 1;
+    font-weight: bold;
+    }
+
+
+    .shaddow{
+    	-webkit-box-shadow: 0 8px 6px -6px black;
+    	   -moz-box-shadow: 0 8px 6px -6px black;
+    	        box-shadow: 0 8px 6px -6px black;
+    }
