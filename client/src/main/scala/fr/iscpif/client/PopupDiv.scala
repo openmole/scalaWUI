@@ -126,10 +126,6 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
 
 
   triggerElement.style.setProperty("cursor", "pointer")
-  triggerElement.onclick = (m: org.scalajs.dom.raw.MouseEvent) => {
-    //popupVisible() = !popupVisible()
-    println("click " + popupVisible())
-  }
 
   lazy val mainDiv = div(arrowStyle +++ arrowPosition)(
     innerDiv(popupStyle +++ popupPosition)
