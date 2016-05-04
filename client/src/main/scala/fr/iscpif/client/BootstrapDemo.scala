@@ -76,8 +76,10 @@ object BootstrapDemo {
         )
       ),
       sel.selector,
-      div("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = greyRightArrow),
-      div("Settings2")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Bottom, popupStyle = whitePopupWithBorder, arrowStyle = greyBottomArrow),
+      div("You")(btn_danger +++ (height := 50) +++ sheet.marginLeft(295)).tooltip(span("héhé"), position = Bottom, arrowStyle = whiteBottomArrow),
+       div("Haha")(btn_info +++ sheet.marginLeft(295)).tooltip(span("héhé"), position = Right, arrowStyle = whiteRightArrow),
+      div("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = whiteRightArrow),
+      div("Settings2")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Bottom, popupStyle = whitePopupWithBorder, arrowStyle = whiteBottomArrow),
       tags.label("nrestiarn")(ms("oo") +++ toto),
       span(glyph_trash),
       Rx {

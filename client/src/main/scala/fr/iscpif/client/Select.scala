@@ -182,6 +182,7 @@ class Select[T <: Select.Displayable](
           )
         }
       ),
+      ClickPopup,
       Bottom,
       whitePopupWithBorder,
       noArrow

@@ -38,18 +38,13 @@ object Popup {
 
   object Bottom extends PopupPosition
 
+  sealed trait PopupType
+
+  object HoverPopup extends PopupType
+
+  object ClickPopup extends PopupType
+
   private val popups: Var[Seq[Popup]] = Var(Seq())
-
-  implicit class PopableHtmlElement(element: org.scalajs.dom.raw.HTMLElement) {
-
-    def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-              position: PopupPosition = Bottom,
-              popupStyle: ModifierSeq = whitePopup,
-              arrowStyle: ModifierSeq = noArrow,
-              onclose: () => Unit = () => {}) = {
-      new Popup(element, innerDiv, position, popupStyle, arrowStyle, onclose).popup
-    }
-  }
 
   implicit class PopableTypedTag(element: TypedTag[org.scalajs.dom.raw.HTMLElement]) {
     def popup(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
@@ -57,8 +52,23 @@ object Popup {
               popupStyle: ModifierSeq = whitePopup,
               arrowStyle: ModifierSeq = noArrow,
               onclose: () => Unit = () => {}) =
-      new PopableHtmlElement(element.render).popup(innerDiv, position, popupStyle, arrowStyle, onclose)
+      new Popup(element.render, innerDiv, ClickPopup, position, popupStyle, arrowStyle, onclose).popup
+
+
+    def tooltip(innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
+                position: PopupPosition = Bottom,
+                popupStyle: ModifierSeq = whitePopup,
+                arrowStyle: ModifierSeq = noArrow,
+                onclose: () => Unit = () => {}
+               ) = new Popup(element.render, innerDiv, HoverPopup, position, popupStyle, arrowStyle, onclose).popup
   }
+
+  def isEqual(e1: Node, to: Node): Boolean = {
+    if (e1.isEqualNode(to)) true
+    else if (e1.isEqualNode(org.scalajs.dom.document.body)) false
+    else isEqual(e1.parentNode, to)
+  }
+
 
   lazy val noArrow: ModifierSeq = Seq()
   lazy val whiteBottomArrow = arrow("white", Bottom)
@@ -75,7 +85,6 @@ object Popup {
     padding := 8,
     borderRadius := "4px",
     backgroundColor := "white",
-    zIndex := 1002,
     boxShadow := "0 8px 6px -6px black"
   )
 
@@ -108,6 +117,7 @@ import Popup._
 
 class Popup(val triggerElement: org.scalajs.dom.raw.HTMLElement,
             innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
+            popupType: PopupType,
             direction: PopupPosition,
             popupStyle: ModifierSeq,
             arrowStyle: ModifierSeq,
@@ -119,31 +129,48 @@ class Popup(val triggerElement: org.scalajs.dom.raw.HTMLElement,
   Obs(popupVisible) {
     if (!popupVisible()) onclose()
   }
+  
+  val zPosition = zIndex := 1002
 
-  lazy val popupPosition: ModifierSeq = direction match {
-    case Bottom => Seq(
-      left := triggerElement.offsetLeft,
-      top := triggerElement.offsetTop + triggerElement.offsetHeight + 5
-    )
+  lazy val popupPosition: ModifierSeq = {
+    direction match {
+      case Bottom => Seq(
+        left := triggerElement.offsetLeft,
+        top := triggerElement.offsetTop + triggerElement.offsetHeight + 5
+      )
 
+      case Right => Seq(
+        left := triggerElement.offsetLeft + triggerElement.offsetWidth + 5,
+        top := triggerElement.offsetTop
+      )
+    }
+  } +++ zPosition +++ absolutePosition
+
+  lazy val arrowPosition: ModifierSeq = {
+    direction match {
+    case Bottom =>
+      Seq(
+        left := (triggerElement.offsetWidth / 2 - 1 + triggerElement.offsetLeft).toInt,
+        top := triggerElement.offsetTop + triggerElement.offsetHeight
+      )
     case Right => Seq(
-      left := triggerElement.offsetLeft + triggerElement.offsetWidth + 5,
-      top := -triggerElement.offsetHeight / 2
+      left := (triggerElement.offsetLeft + triggerElement.offsetWidth).toInt,
+      top := (triggerElement.offsetHeight / 2).toInt
     )
-  }
+  }} +++ zPosition +++ absolutePosition
 
-  lazy val arrowPosition: ModifierSeq = direction match {
-    case Bottom => all.marginLeft((triggerElement.offsetWidth / 2 - 3 + triggerElement.offsetLeft).toInt)
-    case Right => Seq(
-      all.marginLeft((triggerElement.offsetLeft + triggerElement.offsetWidth).toInt),
-      all.marginTop(-(triggerElement.offsetTop + triggerElement.offsetHeight / 2 + 1).toInt)
-    )
-  }
 
   triggerElement.style.setProperty("cursor", "pointer")
+  popupType match {
+    case HoverPopup =>
+      triggerElement.onmouseover = (m: MouseEvent) => popupVisible() = true
+      triggerElement.onmouseleave = (m: MouseEvent) => popupVisible() = false
+    case _ =>
+  }
 
-  lazy val mainDiv = div(arrowStyle +++ arrowPosition)(
-    innerDiv(popupStyle +++ popupPosition)
+  lazy val mainDiv = div(
+    div( arrowStyle +++ arrowPosition),
+    innerDiv( popupStyle +++ popupPosition)
   ).render
 
   val popup = div(relativePosition)(
@@ -155,26 +182,29 @@ class Popup(val triggerElement: org.scalajs.dom.raw.HTMLElement,
 
   def close = popupVisible() = false
 
+
+  // Manage the popups behavior when clicking in other popups or outside popups
   org.scalajs.dom.window.onmouseup = (m: org.scalajs.dom.raw.MouseEvent) => {
-
-    val triggers = popups().map{_.triggerElement}
-    val maindivs = popups().map{_.mainDiv}
-    popups().foreach { p =>
-      if (!triggers.filterNot {
-        _ == p.triggerElement
-      }.exists { t => isEqual(m.srcElement, t) }) {
-        if (isEqual(m.srcElement, p.triggerElement)) p.popupVisible() = !p.popupVisible()
-        else if (!maindivs.exists{md=> isEqual(m.srcElement, md)}) {
-          p.popupVisible() = false
+    popupType match {
+      case ClickPopup =>
+        val triggers = popups().map {
+          _.triggerElement
         }
-      }
+        val maindivs = popups().map {
+          _.mainDiv
+        }
+        popups().foreach { p =>
+          if (!triggers.filterNot {
+            _ == p.triggerElement
+          }.exists { t => isEqual(m.srcElement, t) }) {
+            if (isEqual(m.srcElement, p.triggerElement)) p.popupVisible() = !p.popupVisible()
+            else if (!maindivs.exists { md => isEqual(m.srcElement, md) }) {
+              p.popupVisible() = false
+            }
+          }
+        }
+      case _ =>
     }
-  }
-
-  def isEqual(e1: Node, to: Node): Boolean = {
-    if (e1.isEqualNode(to)) true
-    else if (e1.isEqualNode(org.scalajs.dom.document.body)) false
-    else isEqual(e1.parentNode, to)
   }
 
 }
