@@ -161,11 +161,15 @@ class PopupDiv(val triggerElement: org.scalajs.dom.raw.HTMLElement,
 
   org.scalajs.dom.window.onmouseup = (m: org.scalajs.dom.raw.MouseEvent) => {
 
+    val triggers = popups().map{_.triggerElement}
     popups().foreach { p =>
-      println(" Iterate ")
-      if (m.srcElement.isEqualNode(p.triggerElement)) p.popupVisible() = !p.popupVisible()
-      else if (!isEqual(m.srcElement, p.mainDiv)) {
-        p.popupVisible() = false
+      if (!triggers.filterNot {
+        _ == p.triggerElement
+      }.exists { t => m.srcElement.isEqualNode(t) }) {
+        if (m.srcElement.isEqualNode(p.triggerElement)) p.popupVisible() = !p.popupVisible()
+        else if (!isEqual(m.srcElement, p.mainDiv)) {
+          p.popupVisible() = false
+        }
       }
     }
   }
