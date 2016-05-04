@@ -26,7 +26,7 @@ import rx._
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-object PopupDiv {
+object Popup {
 
   sealed trait PopupPosition
 
@@ -38,7 +38,7 @@ object PopupDiv {
 
   object Bottom extends PopupPosition
 
-  private val popups: Var[Seq[PopupDiv]] = Var(Seq())
+  private val popups: Var[Seq[Popup]] = Var(Seq())
 
   implicit class PopableHtmlElement(element: org.scalajs.dom.raw.HTMLElement) {
 
@@ -47,7 +47,7 @@ object PopupDiv {
               popupStyle: ModifierSeq = whitePopup,
               arrowStyle: ModifierSeq = noArrow,
               onclose: () => Unit = () => {}) = {
-      new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle, onclose).popup
+      new Popup(element, innerDiv, position, popupStyle, arrowStyle, onclose).popup
     }
   }
 
@@ -104,14 +104,14 @@ object PopupDiv {
 
 }
 
-import PopupDiv._
+import Popup._
 
-class PopupDiv(val triggerElement: org.scalajs.dom.raw.HTMLElement,
-               innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-               direction: PopupPosition,
-               popupStyle: ModifierSeq,
-               arrowStyle: ModifierSeq,
-               onclose: () => Unit = () => {}) {
+class Popup(val triggerElement: org.scalajs.dom.raw.HTMLElement,
+            innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
+            direction: PopupPosition,
+            popupStyle: ModifierSeq,
+            arrowStyle: ModifierSeq,
+            onclose: () => Unit = () => {}) {
 
   val popupVisible = Var(false)
   popups() = popups() :+ this

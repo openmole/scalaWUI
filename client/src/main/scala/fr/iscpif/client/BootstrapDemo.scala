@@ -7,7 +7,7 @@ import fr.iscpif.scaladget.stylesheet.{all=> sheet}
 import scalatags.JsDom.tags
 import scalatags.JsDom.all._
 import fr.iscpif.client.stylesheet._
-import PopupDiv._
+import Popup._
 import scalatags.JsDom.{styles => sty}
 import client.JsRxTags._
 import sheet._

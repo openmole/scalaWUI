@@ -34,7 +34,7 @@ package fr.iscpif.client
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fr.iscpif.client.PopupDiv._
+import fr.iscpif.client.Popup._
 import fr.iscpif.scaladget.api.{BootstrapTags ⇒ bs}
 import org.scalajs.dom.raw._
 import fr.iscpif.scaladget.stylesheet.{all ⇒ sheet}
@@ -140,7 +140,7 @@ class Select[T <: Select.Displayable](
 
   lazy val selector = {
 
-    lazy val popupButton: PopupDiv = new PopupDiv(
+    lazy val popupButton: Popup = new Popup(
       span(key +++ pointer, `type` := "button")(
         Rx {
           content().map { c ⇒
