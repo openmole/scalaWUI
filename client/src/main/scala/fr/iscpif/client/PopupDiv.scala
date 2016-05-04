@@ -72,7 +72,7 @@ object PopupDiv {
     width := "auto",
     maxWidth := 200,
     height := "auto",
-    padding := 16,
+    padding := 8,
     borderRadius := "4px",
     backgroundColor := "white",
     zIndex := 1002,

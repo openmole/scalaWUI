@@ -51,7 +51,7 @@ object BootstrapDemo {
 
   def build = {
     val bottom = glyph_triangle_bottom +++ (fontSize := 10)
-    val sel = Select(Seq(TT("aa"), TT("bb"), TT("cc")),
+    val sel = Select(Seq(TT("aauieaa"), TT("bbeeaieai"), TT("uuuieuiecc")),
       Some(TT("bb")),
       btn_primary
     )

@@ -164,10 +164,10 @@ class Select[T <: Select.Displayable](
           )
         else tags.div,
         Rx {
-          tags.ul( sheet.marginLeft(0) +++ (listStyleType := "none"))(
+          tags.div( sheet.marginLeft(0) +++ (listStyleType := "none"))(
             if (filtered().size < 100) {
               for (c ← filtered()) yield {
-                scalatags.JsDom.tags.li(pointer, onclick := { () ⇒
+                tags.div(pointer, onclick := { () ⇒
                   content() = contents().filter {
                     _._1 == c
                   }.headOption.map {
@@ -178,7 +178,7 @@ class Select[T <: Select.Displayable](
                 })(c.name)
               }
             }
-            else scalatags.JsDom.tags.li("To many results, filter more !")
+            else tags.li("To many results, filter more !")
           )
         }
       ),
