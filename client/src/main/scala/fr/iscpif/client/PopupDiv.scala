@@ -38,6 +38,7 @@ object PopupDiv {
 
   object Bottom extends PopupPosition
 
+  private val popups: Var[Seq[PopupDiv]] = Var(Seq())
 
   implicit class PopableHtmlElement(element: org.scalajs.dom.raw.HTMLElement) {
 
@@ -46,8 +47,7 @@ object PopupDiv {
               popupStyle: ModifierSeq = whitePopup,
               arrowStyle: ModifierSeq = noArrow,
               onclose: () => Unit = () => {}) = {
-      val pop = new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle, onclose)
-      org.scalajs.dom.document.body.appendChild(pop.popup.render)
+      new PopupDiv(element, innerDiv, position, popupStyle, arrowStyle, onclose).popup
     }
   }
 
@@ -106,16 +106,17 @@ object PopupDiv {
 
 import PopupDiv._
 
-class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
-                  innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
-                  direction: PopupPosition,
-                  popupStyle: ModifierSeq,
-                  arrowStyle: ModifierSeq,
-                  onclose: ()=> Unit) {
+class PopupDiv(val triggerElement: org.scalajs.dom.raw.HTMLElement,
+               innerDiv: TypedTag[org.scalajs.dom.raw.HTMLElement],
+               direction: PopupPosition,
+               popupStyle: ModifierSeq,
+               arrowStyle: ModifierSeq,
+               onclose: () => Unit = () => {}) {
 
   val popupVisible = Var(false)
+  popups() = popups() :+ this
 
-  Obs(popupVisible){
+  Obs(popupVisible) {
     if (!popupVisible()) onclose()
   }
 
@@ -130,7 +131,6 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
       top := -triggerElement.offsetHeight / 2
     )
   }
-
 
   lazy val arrowPosition: ModifierSeq = direction match {
     case Bottom => all.marginLeft((triggerElement.offsetWidth / 2 - 3 + triggerElement.offsetLeft).toInt)
@@ -153,11 +153,20 @@ class PopupDiv[E](triggerElement: org.scalajs.dom.raw.HTMLElement,
       else span(display := "none").render
     })
 
+  def close = {
+    // println("Close")
+    popupVisible() = false
+  }
+
 
   org.scalajs.dom.window.onmouseup = (m: org.scalajs.dom.raw.MouseEvent) => {
-    if (m.srcElement.isEqualNode(triggerElement)) popupVisible() = !popupVisible()
-    else if (!isEqual(m.srcElement, mainDiv)) {
-      popupVisible() = false
+
+    popups().foreach { p =>
+      println(" Iterate ")
+      if (m.srcElement.isEqualNode(p.triggerElement)) p.popupVisible() = !p.popupVisible()
+      else if (!isEqual(m.srcElement, p.mainDiv)) {
+        p.popupVisible() = false
+      }
     }
   }
 

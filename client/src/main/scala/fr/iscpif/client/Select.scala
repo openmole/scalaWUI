@@ -34,6 +34,7 @@ package fr.iscpif.client
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import fr.iscpif.client.PopupDiv._
 import fr.iscpif.scaladget.api.{BootstrapTags ⇒ bs}
 import org.scalajs.dom.raw._
 import fr.iscpif.scaladget.stylesheet.{all ⇒ sheet}
@@ -138,11 +139,9 @@ class Select[T <: Select.Displayable](
   def isContentsEmpty = contents().isEmpty
 
   lazy val selector = {
-    lazy val bg: HTMLDivElement = div(dropdown)(
-      tags.span(
-        key +++ dropdownToggle +++ pointer,
-        `type` := "button", data("toggle") /*"data-toggle".attr*/ := "dropdown"
-      )(
+
+    lazy val popupButton: PopupDiv = new PopupDiv(
+      span(key +++ pointer, `type` := "button")(
         Rx {
           content().map { c ⇒
             bs.glyphSpan(glyphMap()(c))
@@ -155,38 +154,43 @@ class Select[T <: Select.Displayable](
         },
         span(ms("caret"))
       ).render,
-      ul(dropdownMenu, id := autoID)(
+      div(
         if (hasFilter())
-          scalatags.JsDom.tags.li(
+          div(
             tags.form(inputFilter)(`type` := "submit", onsubmit := { () ⇒
               content() = filtered().headOption
-              bg.click()
+             // bg.click()
               false
             })
           )
         else tags.div,
         Rx {
-          tags.div(
+          tags.ul( sheet.marginLeft(0) +++ (listStyleType := "none"))(
             if (filtered().size < 100) {
               for (c ← filtered()) yield {
-                scalatags.JsDom.tags.li(ms("selectElement"), pointer, role := "presentation", onclick := { () ⇒
+                scalatags.JsDom.tags.li(pointer, onclick := { () ⇒
                   println("content " + content())
                   content() = contents().filter {
                     _._1 == c
                   }.headOption.map {
                     _._1
                   }
-                  println("content " + content())
                   onclickExtra()
+                  popupButton.close
                 })(c.name)
               }
             }
             else scalatags.JsDom.tags.li("To many results, filter more !")
           )
         }
-      )
-    ).render
-    bg
+      ),
+      Bottom,
+      whitePopupWithBorder,
+      noArrow
+    )
+
+    popupButton.popup
+
   }
 
   lazy val selectorWithFilter = {

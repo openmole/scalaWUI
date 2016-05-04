@@ -75,9 +75,10 @@ object BootstrapDemo {
           )
         )
       ),
-      span("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = whiteRightArrow),
+      //sel.selector,
+      div("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = greyRightArrow),
+      div("Settings2")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Bottom, popupStyle = whitePopupWithBorder, arrowStyle = greyBottomArrow),
       tags.label("nrestiarn")(ms("oo") +++ toto),
-      sel.selector,
       span(glyph_trash),
       Rx {
         span(aria.hidden := "true", glyph_upload +++ ms("fileUpload glyphmenu"))
