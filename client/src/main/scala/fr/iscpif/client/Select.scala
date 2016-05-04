@@ -159,7 +159,6 @@ class Select[T <: Select.Displayable](
           div(
             tags.form(inputFilter)(`type` := "submit", onsubmit := { () ⇒
               content() = filtered().headOption
-             // bg.click()
               false
             })
           )
@@ -169,7 +168,6 @@ class Select[T <: Select.Displayable](
             if (filtered().size < 100) {
               for (c ← filtered()) yield {
                 scalatags.JsDom.tags.li(pointer, onclick := { () ⇒
-                  println("content " + content())
                   content() = contents().filter {
                     _._1 == c
                   }.headOption.map {
