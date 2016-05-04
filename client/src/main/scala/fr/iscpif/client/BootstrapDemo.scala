@@ -75,7 +75,7 @@ object BootstrapDemo {
           )
         )
       ),
-      //sel.selector,
+      sel.selector,
       div("Settings")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Right, popupStyle = whitePopupWithBorder, arrowStyle = greyRightArrow),
       div("Settings2")(btn_primary, sheet.marginLeft(145)).popup(inner, position = Bottom, popupStyle = whitePopupWithBorder, arrowStyle = greyBottomArrow),
       tags.label("nrestiarn")(ms("oo") +++ toto),
