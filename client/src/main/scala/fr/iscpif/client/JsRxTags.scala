@@ -17,62 +17,81 @@
  */
 package client
 
-import scala.collection.{SortedMap, mutable}
+
+import org.scalajs.dom.raw.{ HTMLDivElement, SVGElement, Node }
 import scalatags.JsDom._
-import scala.util.{Failure, Success, Random}
+import scala.util.{ Failure, Success }
 import all._
 import rx._
-import rx.core.{Propagator, Obs}
-import org.scalajs.dom
-import org.scalajs.dom.{Element, DOMParser}
-import scala.scalajs.js
-
+import org.scalajs.dom.{ Element }
 
 /**
- * A minimal binding between Scala.Rx and Scalatags and Scala-Js-Dom
- */
+  * A minimal binding between Scala.Rx and Scalatags and Scala-Js-Dom
+  */
 object JsRxTags {
 
+  implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
   /**
-   * Wraps reactive strings in spans, so they can be referenced/replaced
-   * when the Rx changes.
-   */
-  implicit def RxStr[T](r: Rx[T])(implicit f: T => Modifier): Modifier = {
-    rxMod(Rx(span(r())))
+    * Wraps reactive strings in spans, so they can be referenced/replaced
+    * when the Rx changes.
+    */
+  implicit def RxStr[T](r: Rx[T])(implicit f: T ⇒ Modifier): Modifier = {
+    rxHTMLMod(Rx(span(r())))
   }
 
   /**
-   * Sticks some Rx into a Scalatags fragment, which means hooking up an Obs
-   * to propagate changes into the DOM via the element's ID. Monkey-patches
-   * the Obs onto the element itself so we have a reference to kill it when
-   * the element leaves the DOM (e.g. it gets deleted).
-   */
-  implicit def rxMod[T <: dom.raw.HTMLElement](r: Rx[HtmlTag]): Modifier = {
+    * Sticks some Rx into a Scalatags fragment, which means hooking up an Obs
+    * to propagate changes into the DOM via the element's ID. Monkey-patches
+    * the Obs onto the element itself so we have a reference to kill it when
+    * the element leaves the DOM (e.g. it gets deleted).
+    */
+  implicit def rxHTMLMod[T <: HtmlTag](r: Rx[T]): Modifier = bindNode(rxHTMLNode(r))
+
+  // implicit def rxHTMLTagedType[T <: HtmlTag](r: Rx[T]): Modifier = bindNode(rxHTMLNode(r))
+
+  implicit def rxHTMLNode[T <: HtmlTag](r: Rx[T]): Node = {
     def rSafe = r.toTry match {
-      case Success(v) => v.render
-      case Failure(e) => span(e.toString, backgroundColor := "red").render
+      case Success(v) ⇒ v.render
+      case Failure(e) ⇒ span(e.toString, backgroundColor := "red").render
     }
     var last = rSafe
-    Obs(r, skipInitial = true) {
+    r.triggerLater {
       val newLast = rSafe
-      last.parentElement.replaceChild(newLast, last)
+      last.parentNode.replaceChild(newLast, last)
       last = newLast
     }
-    bindNode(last)
+    last
   }
 
-  implicit def RxAttrValue[T: scalatags.JsDom.AttrValue] = new scalatags.JsDom.AttrValue[Rx[T]] {
-    def apply(t: Element, a: Attr, r: Rx[T]): Unit = {
-      Obs(r) {
-        implicitly[scalatags.JsDom.AttrValue[T]].apply(t, a, r())
+  /**
+    * Idem for SVG elements
+    */
+  implicit def rxSVGMod[T <: TypedTag[SVGElement]](r: Rx[T]): Modifier = {
+    def rSafe = r.toTry match {
+      case Success(v) ⇒ v.render
+      case Failure(e) ⇒ span(e.toString, backgroundColor := "red").render
+    }
+    var last = rSafe
+    r.triggerLater {
+      val newLast = rSafe
+      last.parentNode.replaceChild(newLast, last)
+      last = newLast
+    }
+    last
+  }
+
+  implicit def RxAttrValue[T: scalatags.JsDom.AttrValue] = new scalatags.JsDom.AttrValue[Rx.Dynamic[T]] {
+    def apply(t: Element, a: Attr, r: Rx.Dynamic[T]): Unit = {
+      r.trigger {
+        implicitly[scalatags.JsDom.AttrValue[T]].apply(t, a, r.now)
       }
     }
   }
 
-  implicit def RxStyleValue[T: scalatags.JsDom.StyleValue] = new scalatags.JsDom.StyleValue[Rx[T]] {
-    def apply(t: Element, s: Style, r: Rx[T]): Unit = {
-      Obs(r) {
-        implicitly[scalatags.JsDom.StyleValue[T]].apply(t, s, r())
+  implicit def RxStyleValue[T: scalatags.JsDom.StyleValue] = new scalatags.JsDom.StyleValue[Rx.Dynamic[T]] {
+    def apply(t: Element, s: Style, r: Rx.Dynamic[T]): Unit = {
+      r.trigger {
+        implicitly[scalatags.JsDom.StyleValue[T]].apply(t, s, r.now)
       }
     }
   }

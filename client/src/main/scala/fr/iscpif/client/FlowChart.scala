@@ -16,11 +16,12 @@ package client
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import fr.iscpif.scaladget.mapping._
 import shared.Api
 import org.scalajs.dom
 import scala.scalajs.js
-import js.Dynamic.{ literal ⇒ lit }
+import js.Dynamic.{literal ⇒ lit}
 import rx._
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 import autowire._
@@ -43,12 +44,12 @@ object Graph {
 class Task(val id: String,
            val title: Var[String] = Var(""),
            val location: Var[(Double, Double)] = Var((0.0, 0.0))) extends GraphElement {
-  def literal = lit("id" -> id, "title" -> title(), "x" -> location()._1, "y" -> location()._2)
+  def literal = lit("id" -> id, "title" -> title.now, "x" -> location.now._1, "y" -> location.now._2)
 }
 
 class Edge(val source: Var[Task],
            val target: Var[Task]) extends GraphElement {
-  def literal = lit("source" -> source().literal, "target" -> target().literal)
+  def literal = lit("source" -> source.now.literal, "target" -> target.now.literal)
 }
 
 class Window(nodes: Array[Task] = Array(), edges: Array[Edge] = Array()) {
@@ -73,6 +74,8 @@ case class Consts(selectedClass: String = "selected",
                   nodeRadius: Double = 50)
 
 class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[Edge]) {
+
+  implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
   implicit def dynamicToString(d: js.Dynamic): String = d.asInstanceOf[String]
 
@@ -137,10 +140,10 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
     .on("keydown", (_: js.Any, _: Double) ⇒ {
       d3.event.keyCode match {
         case consts.DELETE_KEY ⇒
-          tasks().filter(t ⇒ t().selected()).map { t ⇒
+          tasks.now.filter(t ⇒ t.now.selected.now).map { t ⇒
             removeTask(t)
           }
-          edges().filter(e ⇒ e().selected()).map { e ⇒
+          edges.now.filter(e ⇒ e.now.selected.now).map { e ⇒
             removeEdge(e)
           }
         case _ ⇒
@@ -150,13 +153,13 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
   def mouseXY = d3.mouse(svgElement)
 
   def mousemove = {
-    Seq(mouseDownTask()).flatten.map { t ⇒
+    Seq(mouseDownTask.now).flatten.map { t ⇒
       val xy = mouseXY
       val x = xy(0)
       val y = xy(1)
       if (d3.event.shiftKey) {
         dragging() = true
-        dragLine.attr("d", "M" + t.location()._1 + "," + t.location()._2 + "L" + x + "," + y)
+        dragLine.attr("d", "M" + t.location.now._1 + "," + t.location.now._2 + "L" + x + "," + y)
       }
       else {
         t.location() = (x, y)
@@ -167,10 +170,10 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
   def mouseup = {
     // Hide the drag line
     val xy = mouseXY
-    if (d3.event.shiftKey && !dragging()) {
+    if (d3.event.shiftKey && !dragging.now) {
       val (x, y) = (xy(0), xy(1))
-      Post[Api].uuid.call().foreach{ i=>
-      addTask(i, i, x, y)
+      Post[Api].uuid.call().foreach { i =>
+        addTask(i, i, x, y)
 
       }
     }
@@ -182,27 +185,27 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
   }
 
   // ADD, SELECT AND REMOVE ITEMS //
-  def unselectTasks = tasks().foreach { t ⇒ t().selected() = false }
+  def unselectTasks = tasks.now.foreach { t ⇒ t.now.selected() = false }
 
-  def unselectEdges = edges().foreach { e ⇒ e().selected() = false }
+  def unselectEdges = edges.now.foreach { e ⇒ e.now.selected() = false }
 
   def removeTask(t: Var[Task]) = {
-    tasks() = tasks() diff Array(t)
-    edges() = edges().filterNot(e ⇒ e().source() == t() || e().target() == t())
+    tasks() = tasks.now diff Array(t)
+    edges() = edges.now.filterNot(e ⇒ e.now.source.now == t.now || e.now.target.now == t.now)
   }
 
   def removeEdge(e: Var[Edge]) = {
-    edges() = edges() diff Array(e)
+    edges() = edges.now diff Array(e)
   }
 
   def addTask(id: String, title: String, x: Double, y: Double): Unit = addTask(new Task(id, Var(title), Var((x, y))))
 
   def addTask(task: Task): Unit = {
-    tasks() = tasks() :+ Var(task)
+    tasks() = tasks.now :+ Var(task)
 
-    Obs(tasks) {
-      val mysel = circleRoot.selectAll("g").data(tasks().toJSArray, (task: Var[Task], n: Double) ⇒ {
-        task().id.toString
+    tasks.trigger {
+      val mysel = circleRoot.selectAll("g").data(tasks.now.toJSArray, (task: Var[Task], n: Double) ⇒ {
+        task.now.id.toString
       })
 
       val newG = mysel.enter().append("g")
@@ -222,16 +225,16 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
 
       newG.on("mousedown", (t: Var[Task], n: Double) ⇒ {
 
-        mouseDownTask() = Some(t())
+        mouseDownTask() = Some(t.now)
         d3.event.stopPropagation
 
         unselectTasks
         unselectEdges
-        t().selected() = !t().selected()
+        t.now.selected() = !t.now.selected.now
 
         if (d3.event.shiftKey) {
-          val x = t().location()._1
-          val y = t().location()._2
+          val x = t.now.location.now._1
+          val y = t.now.location.now._2
           dragLine
             .style("marker-end", "url(#mark-end-arrow)")
             .classed("hidden", false)
@@ -239,9 +242,9 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
         }
       })
         .on("mouseup.task", (t: Var[Task], n: Double) ⇒ {
-          Seq(mouseDownTask()).flatten.map { mdt ⇒
-            if (t() != mdt) {
-              addEdge(mdt, t())
+          Seq(mouseDownTask.now).flatten.map { mdt ⇒
+            if (t.now != mdt) {
+              addEdge(mdt, t.now)
             }
           }
         }
@@ -254,11 +257,11 @@ class GraphCreator(svgSelection: Selection, _tasks: Array[Task], _edges: Array[E
   def addEdge(source: Task, target: Task): Unit = addEdge(new Edge(Var(source), Var(target)))
 
   def addEdge(edge: Edge): Unit = {
-    edges() = edges() :+ Var(edge)
+    edges() = edges.now :+ Var(edge)
 
-    Obs(edges) {
-      val mysel = pathRoot.selectAll("path").data(edges().toJSArray, (edge: Var[Edge], n: Double) ⇒ {
-        edge().source().id + "+" + edge().target().id
+    edges.trigger {
+      val mysel = pathRoot.selectAll("path").data(edges.now.toJSArray, (edge: Var[Edge], n: Double) ⇒ {
+        edge.now.source.now.id + "+" + edge.now.target.now.id
       })
 
       val newPath = mysel.enter().append("path")
