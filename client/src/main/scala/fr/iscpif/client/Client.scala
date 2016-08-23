@@ -1,20 +1,10 @@
 package client
 
-<<<<<<< HEAD
-=======
-import fr.iscpif.scaladget.stylesheet.bootstrap
->>>>>>> 941e434... Upgrade libs
 import org.scalajs.dom
 import scala.concurrent.Future
-import scalatags.JsDom._
-import all._
-import tags2.section
 import rx._
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
-import shared._
-import upickle._
-import autowire._
 
 @JSExport("Client")
 object Client {

@@ -30,6 +30,8 @@ object ScalaWUIBuild extends Build {
     scalaVersion := ScalaVersion
   )
 
+val jqueryPath = s"META-INF/resources/webjars/jquery/$jqueryVersion/jquery.js"
+
   lazy val client = Project(
     "client",
     file("client"),
