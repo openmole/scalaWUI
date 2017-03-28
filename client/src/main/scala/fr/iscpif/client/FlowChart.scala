@@ -17,7 +17,7 @@ package client
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import fr.iscpif.scaladget.mapping._
+import scaladget.mapping._
 import shared.Api
 import org.scalajs.dom
 import scala.scalajs.js

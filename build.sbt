@@ -13,7 +13,7 @@ val scalatagsVersion = "0.6.2"
 val autowireVersion = "0.2.6"
 val upickleVersion = "0.4.1"
 val rxVersion = "0.3.1"
-val scaladgetVersion = "0.8.1"
+val scaladgetVersion = "0.9.2-SNAPSHOT"
 val scalajsDomVersion = "0.9.1"
 val jqueryVersion = "2.2.1"
 val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
@@ -32,10 +32,6 @@ lazy val client = project.in(file("client")) settings(
   resolvers in ThisBuild ++= Resolvers,
   skip in packageJSDependencies := false,
   jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
-  //jsDependencies += "org.webjars" % "jquery" % "2.2.1" / "jquery.js",
-  jsDependencies += "org.webjars" % "jquery" % jqueryVersion / jqueryPath minified jqueryPath.replace(".js", ".min.js"),
-  jsDependencies += "org.webjars" % "bootstrap" % "3.3.6" / "js/bootstrap.js" dependsOn jqueryPath minified "js/bootstrap.min.js",
-  //  jsDependencies += "org.webjars" % "bootstrap" % "3.3.6" / "js/bootstrap.min.js",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
     "com.lihaoyi" %%% "upickle" % upickleVersion,
