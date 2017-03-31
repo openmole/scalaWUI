@@ -26,7 +26,7 @@ import scalatags.JsDom.svgAttrs
 import scalatags.JsDom.svgTags
 import scaladget.stylesheet.all._
 import scaladget.api.svg._
-import client.JsRxTags._
+import scaladget.tools.JsRxTags._
 import org.scalajs.dom.raw._
 
 trait Selectable {
@@ -42,10 +42,12 @@ object Graph {
              val target: Var[Task]) extends Selectable
 
   def task(title: String, x: Double, y: Double) = Task(Var(title), Var((x, y)))
+
   def edge(source: Task, target: Task) = new Edge(Var(source), Var(target))
 }
 
 import Graph._
+
 class Window(nodes: Seq[Task] = Seq(), edges: Seq[Edge] = Seq()) {
 
   val svgNode = {
@@ -75,10 +77,9 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   val DELETE_KEY = 46
   val NODE_RADIUS = 50
   val END_ARROW: String = "end-arrow"
-  val URL_END_ARROW: String = "url(#end-arrow)"
+  val URL_END_ARROW: String = s"url(#${END_ARROW})"
   val MARK_END_ARROW: String = "mark-end-arrow"
-  val URL_MARK_END_ARROW: String = "url(#mark-end-arrow)"
-
+  val URL_MARK_END_ARROW: String = s"url(#${MARK_END_ARROW})"
 
   class DragLine {
     private val m: Var[(Int, Int)] = Var((0, 0))
@@ -97,10 +98,10 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
       this
     }
 
-    val render = Rx {
+    val render: SVGElement = Rx {
       path(ms = ms(s"$LINK_DRAGLINE ${
         if (dragging()) "" else HIDDEN
-      }")).m(m()._1, m()._2).l(l()._1, l()._2)(svgAttrs.markerEnd := URL_MARK_END_ARROW).render.render
+      }")).m(m()._1, m()._2).l(l()._1, l()._2)(svgAttrs.markerEnd := URL_MARK_END_ARROW).render
     }
   }
 
@@ -141,7 +142,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     // Hide the drag line
     if (me.shiftKey && !dragLine.dragging.now) {
       val (x, y) = (me.clientX, me.clientY)
-        addTask(task(UUID.randomUUID().toString, x, y))
+      addTask(task(UUID.randomUUID().toString, x, y))
     }
     mouseDownTask() = None
     dragLine.dragging() = false
@@ -177,22 +178,18 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   }
 
   def circle(task: Task) = {
-    val gCircle: SVGElement = {
+    val element: SVGElement = Rx {
       svgTags.g(
-        rxSVGMod(
-          Rx {
-            svgTags.g(
-              ms(CIRCLE + {
-                if (task.selected()) s" $SELECTED" else ""
-              })
-            )(
-              svgAttrs.transform := s"translate(${
-                val location = task.location()
-                s"${location._1}, ${location._2}"
-              })")(svgTags.circle(svgAttrs.r := NODE_RADIUS).render)
-          }
-        ))
-    }.render
+        ms(CIRCLE + {
+          if (task.selected()) s" $SELECTED" else ""
+        })
+      )(
+        svgAttrs.transform := s"translate(${
+          val location = task.location()
+          s"${location._1}, ${location._2}"
+        })")(svgTags.circle(svgAttrs.r := NODE_RADIUS).render)
+    }
+    val gCircle = svgTags.g(element).render
 
     gCircle.onmousedown = (me: MouseEvent) => {
       mouseDownTask() = Some(task)
@@ -217,30 +214,30 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     addEdge(edge(e.source.now, e.target.now))
   }
 
-  def link(edge: Edge) =
-    svgTags.g(
-      rxSVGMod(Rx {
-        val p = path(ms = (if (edge.selected()) ms("selected") else emptyMod) +++
-          ms(LINK)).m(
-          edge.source().location()._1.toInt,
-          edge.source().location()._2.toInt
-        ).l(
-          edge.target().location()._1.toInt,
-          edge.target().location()._2.toInt
-        ).render(svgAttrs.markerEnd := URL_END_ARROW).render
+  def link(edge: Edge) = {
+    val sVGElement: SVGElement = Rx {
+      val p = path(ms = (if (edge.selected()) ms(SELECTED) else emptyMod) +++
+        ms(LINK)).m(
+        edge.source().location()._1.toInt,
+        edge.source().location()._2.toInt
+      ).l(
+        edge.target().location()._1.toInt,
+        edge.target().location()._2.toInt
+      ).render(svgAttrs.markerEnd := URL_END_ARROW).render
 
-        p.onmousedown = (me: MouseEvent) => {
-          unselectTasks
-          unselectEdges
-          edge.selected() = !edge.selected.now
-        }
-        svgTags.g(p)
+      p.onmousedown = (me: MouseEvent) => {
+        unselectTasks
+        unselectEdges
+        edge.selected() = !edge.selected.now
       }
-      )
-    ).render
+      p
+    }
 
-  def addToScene[T](s: Var[Seq[Var[T]]], draw: T=> SVGElement) = svgG.appendChild(svgTags.g(
-    rxSVGMod(Rx {
+    svgTags.g(sVGElement).render
+  }
+
+  def addToScene[T](s: Var[Seq[Var[T]]], draw: T => SVGElement) = {
+    val element: SVGElement = Rx {
       svgTags.g(
         for {
           t <- s()
@@ -248,8 +245,9 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
           draw(t.now)
         }
       )
-    }).render
-  ).render)
+    }
+    svgG.appendChild(svgTags.g(element).render).render
+  }
 
   addToScene(edges, link)
   addToScene(tasks, circle)
