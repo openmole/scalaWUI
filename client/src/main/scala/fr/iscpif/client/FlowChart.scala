@@ -33,6 +33,7 @@ trait Selectable {
   val selected: Var[Boolean] = Var(false)
 }
 
+// DEFINE SOME CASE CLASS TO STORE TASK AND EDGE STRUCTURES
 object Graph {
 
   case class Task(title: Var[String] = Var(""),
@@ -81,6 +82,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   val MARK_END_ARROW: String = "mark-end-arrow"
   val URL_MARK_END_ARROW: String = s"url(#${MARK_END_ARROW})"
 
+  // DEFINE A SVG ELEMENT TO DISPLAY A PHANTOM LINK WHILE DRAGGING A LINK FROM ONE TASK TO ANOTHER
   class DragLine {
     private val m: Var[(Int, Int)] = Var((0, 0))
     private val l: Var[(Int, Int)] = Var((0, 0))
@@ -122,6 +124,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   val mouseDownTask: Var[Option[Task]] = Var(None)
   val dragging: Var[Option[DragLine]] = Var(None)
 
+  // EVENT DEFINITIONS FOR MOUSEUP AND MOUSEDOWN ON THE SCENE
   svg.onmousemove = (me: MouseEvent) => mousemove(me)
   svg.onmouseup = (me: MouseEvent) => mouseup(me)
 
@@ -177,7 +180,8 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     addTask
   }
 
-  def circle(task: Task) = {
+  // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
+   def circle(task: Task) = {
     val element: SVGElement = Rx {
       svgTags.g(
         ms(CIRCLE + {
@@ -214,6 +218,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     addEdge(edge(e.source.now, e.target.now))
   }
 
+  // DEFINE A LINK, WHICH CAN BE SELECTED AND REMOVED (DEL KEY)
   def link(edge: Edge) = {
     val sVGElement: SVGElement = Rx {
       val p = path(ms = (if (edge.selected()) ms(SELECTED) else emptyMod) +++
@@ -236,6 +241,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     svgTags.g(sVGElement).render
   }
 
+  // ADD ALL LINKS AND CIRCLES ON THE SCENE. THE RX SEQUENCE IS AUTOMATICALLY RUN IN CASE OF tasks or edges ALTERATION
   def addToScene[T](s: Var[Seq[Var[T]]], draw: T => SVGElement) = {
     val element: SVGElement = Rx {
       svgTags.g(
@@ -252,7 +258,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   addToScene(edges, link)
   addToScene(tasks, circle)
 
-  // GLOBAL EVENTS //
+  // DEAL WITH DEL KEY ACTION
   dom.document.onkeydown = (e: KeyboardEvent) => {
     e.keyCode match {
       case DELETE_KEY ⇒
@@ -266,7 +272,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     }
   }
 
-  // ADD, SELECT AND REMOVE ITEMS //
+  // ADD, SELECT AND REMOVE ITEMS
   def unselectTasks = tasks.now.foreach { t ⇒ t.now.selected() = false }
 
   def unselectEdges = edges.now.foreach { e ⇒ e.now.selected() = false }
