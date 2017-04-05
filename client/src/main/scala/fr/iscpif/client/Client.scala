@@ -22,8 +22,12 @@ object Client {
       EdgeData(nodes(r.nextInt(10)), nodes(r.nextInt(100)))
     }
 
-    new Window(nodes, edges)
+    Window.render(nodes, edges)
   }
+
+  @JSExport
+  def runOpenMOLEWF() = Window.renderOpenMOLEWF
+
 }
 
 object Post extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer] {

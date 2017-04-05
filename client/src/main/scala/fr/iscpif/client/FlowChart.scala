@@ -72,7 +72,8 @@ object Graph {
 
 import Graph._
 
-class Window(nodes: Seq[TaskData] = Seq(), edges: Seq[EdgeData] = Seq()) {
+
+object Window {
 
   val svgNode = {
     val child = svgTags.svg(
@@ -83,11 +84,21 @@ class Window(nodes: Seq[TaskData] = Seq(), edges: Seq[EdgeData] = Seq()) {
     child
   }
 
-  Post[Api].layout(nodes, edges).call().foreach { gl =>
-    new GraphCreator(svgNode,
-      gl.tasks,
-      gl.edges
-    )
+  def createGraph(graphLayout: GraphLayout) = new GraphCreator(svgNode,
+        graphLayout.tasks,
+        graphLayout.edges
+      )
+
+  def render(nodes: Seq[TaskData], edges: Seq[EdgeData]) = {
+    Post[Api].layout(nodes, edges).call().foreach {
+      createGraph
+    }
+  }
+
+  def renderOpenMOLEWF = {
+    Post[Api].openMOLEWFLayout().call().foreach {
+      createGraph
+    }
   }
 }
 
@@ -217,7 +228,12 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[TaskData], _edges: Seq[EdgeData]
         svgAttrs.transform := s"translate(${
           val location = task.location()
           s"${location._1}, ${location._2}"
-        })")(svgTags.circle(svgAttrs.r := NODE_RADIUS).render)
+        })")(
+        svgTags.circle(svgAttrs.r := NODE_RADIUS).render,
+        svgTags.text(svgAttrs.textAnchor := "middle")(
+          svgTags.tspan(task.title())
+        )
+      )
     }
     val gCircle = svgTags.g(element).render
 

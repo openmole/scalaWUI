@@ -59,7 +59,11 @@ lazy val server = project.in(file("server")) settings(
     "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
     "org.eclipse.jetty" % "jetty-webapp" % jettyVersion,
     "org.eclipse.jetty" % "jetty-server" % jettyVersion,
-    "at.ait.dme.forcelayout" %% "scala-force-layout" % "0.4.1-SNAPSHOT"
+    "at.ait.dme.forcelayout" %% "scala-force-layout" % "0.4.1-SNAPSHOT",
+    "org.openmole" %% "org-openmole-core-workflow" % "7.0-SNAPSHOT",
+    "org.openmole" %% "org-openmole-plugin-task-scala" % "7.0-SNAPSHOT",
+    "org.openmole" %% "org-openmole-plugin-method-directsampling" % "7.0-SNAPSHOT",
+    "org.openmole" %% "org-openmole-plugin-hook-display" % "7.0-SNAPSHOT"
   )
 ) dependsOn (shared, ext) enablePlugins (JettyPlugin)
 
