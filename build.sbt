@@ -20,18 +20,19 @@ val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
-lazy val shared = project.in(file("./shared")).settings(
+lazy val shared = project.in(file("shared")).settings(
   scalaVersion := ScalaVersion
-)
+) enablePlugins(ScalaJSPlugin)
 
-val jqueryPath = s"META-INF/resources/webjars/jquery/$jqueryVersion/jquery.js"
+lazy val ext = project.in(file("ext")) settings(
+  scalaVersion := ScalaVersion
+) dependsOn(shared) enablePlugins(ScalaJSPlugin)
 
 lazy val client = project.in(file("client")) settings(
   version := Version,
   scalaVersion := ScalaVersion,
   resolvers in ThisBuild ++= Resolvers,
   skip in packageJSDependencies := false,
-  jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
     "com.lihaoyi" %%% "upickle" % upickleVersion,
@@ -41,7 +42,7 @@ lazy val client = project.in(file("client")) settings(
     "org.scala-js" %%% "scalajs-dom" % scalajsDomVersion,
     "org.json4s" %% "json4s-jackson" % json4sVersion
   )
-) dependsOn (shared) enablePlugins (ScalaJSPlugin)
+) dependsOn (shared, ext) enablePlugins (ScalaJSPlugin)
 
 lazy val server = project.in(file("server")) settings(
   organization := Organization,
@@ -57,9 +58,10 @@ lazy val server = project.in(file("server")) settings(
     "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
     "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
     "org.eclipse.jetty" % "jetty-webapp" % jettyVersion,
-    "org.eclipse.jetty" % "jetty-server" % jettyVersion
+    "org.eclipse.jetty" % "jetty-server" % jettyVersion,
+    "at.ait.dme.forcelayout" %% "scala-force-layout" % "0.4.1-SNAPSHOT"
   )
-) dependsOn (shared) enablePlugins (JettyPlugin)
+) dependsOn (shared, ext) enablePlugins (JettyPlugin)
 
 lazy val go = taskKey[Unit]("go")
 
@@ -73,7 +75,7 @@ lazy val bootstrap = project.in(file("target/bootstrap")) settings(
 
     copy(clientTarget, clientResource, new File(serverTarget, "webapp"))
   }
-) dependsOn(client, server)
+) dependsOn(client, server, ext, shared)
 
 def copy(clientTarget: Attributed[File], resources: File, webappServerTarget: File) = {
   clientTarget.map { ct =>

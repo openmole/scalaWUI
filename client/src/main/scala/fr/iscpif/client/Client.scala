@@ -3,6 +3,7 @@ package client
 import org.scalajs.dom
 import scala.concurrent.Future
 import rx._
+import shared.Data._
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 
@@ -10,24 +11,24 @@ import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
 @JSExport("Client")
 object Client {
 
-  val helloValue = Var(0)
-  val caseClassValue = Var("empty")
-
   @JSExport
-  def run() {
+  def run() = {
     val nodes = Seq(
-      Graph.task("one", 400, 600),
-      Graph.task("two", 1000, 600),
-      Graph.task("three", 400, 100),
-      Graph.task("four", 1000, 100),
-      Graph.task("five", 105, 60)
+      TaskData(title = "one"),
+      TaskData(title = "two"),
+      TaskData(title = "three"),
+      TaskData(title = "four"),
+      TaskData(title = "five")
     )
+
     val edges = Seq(
-      Graph.edge(nodes(0), nodes(1)),
-      Graph.edge(nodes(0), nodes(2)),
-      Graph.edge(nodes(3), nodes(1)),
-      Graph.edge(nodes(3), nodes(2)))
-    val window = new Window(nodes, edges)
+      EdgeData(nodes(0), nodes(1)),
+      EdgeData(nodes(0), nodes(2)),
+      EdgeData(nodes(3), nodes(1)),
+      EdgeData(nodes(3), nodes(2))
+    )
+
+    new Window(nodes, edges)
   }
 }
 

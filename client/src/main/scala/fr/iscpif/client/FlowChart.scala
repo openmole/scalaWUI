@@ -18,9 +18,16 @@ package client
  */
 
 import java.util.UUID
+
+import ext.Api
 import org.scalajs.dom
+
 import scala.scalajs.js
 import rx._
+
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+import autowire._
+
 import scalatags.JsDom.all._
 import scalatags.JsDom.svgAttrs
 import scalatags.JsDom.svgTags
@@ -28,6 +35,7 @@ import scaladget.stylesheet.all._
 import scaladget.api.svg._
 import scaladget.tools.JsRxTags._
 import org.scalajs.dom.raw._
+import shared.Data._
 
 trait Selectable {
   val selected: Var[Boolean] = Var(false)
@@ -36,20 +44,35 @@ trait Selectable {
 // DEFINE SOME CASE CLASS TO STORE TASK AND EDGE STRUCTURES
 object Graph {
 
-  case class Task(title: Var[String] = Var(""),
+  case class Task(id: ID,
+                  title: Var[String] = Var(""),
                   location: Var[(Double, Double)] = Var((0.0, 0.0))) extends Selectable
 
-  class Edge(val source: Var[Task],
-             val target: Var[Task]) extends Selectable
+  class Edge(val source: Task,
+             val target: Task) extends Selectable
 
-  def task(title: String, x: Double, y: Double) = Task(Var(title), Var((x, y)))
+  def task(title: String, x: Double, y: Double): Task = task(uuid, title, x, y)
 
-  def edge(source: Task, target: Task) = new Edge(Var(source), Var(target))
+  def task(id: ID, title: String, x: Double, y: Double): Task = Task(id, Var(title), Var(x, y))
+
+  def edge(source: Task, target: Task) = new Edge(source, target)
+
+  implicit def taskDataToTask(td: TaskData): Task = task(td.id, td.title, td.location._1, td.location._2)
+
+  implicit def edgeDataToEdge(ed: EdgeData): Edge = edge(ed.source, ed.target)
+
+  implicit def seqOfTaskDataToSeqOfTask(tds: Seq[TaskData]): Seq[Task] = tds.map {
+    taskDataToTask
+  }
+
+  implicit def seqOfEdgeDataToSeqOfEdge(eds: Seq[EdgeData]): Seq[Edge] = eds.map {
+    edgeDataToEdge
+  }
 }
 
 import Graph._
 
-class Window(nodes: Seq[Task] = Seq(), edges: Seq[Edge] = Seq()) {
+class Window(nodes: Seq[TaskData] = Seq(), edges: Seq[EdgeData] = Seq()) {
 
   val svgNode = {
     val child = svgTags.svg(
@@ -60,13 +83,16 @@ class Window(nodes: Seq[Task] = Seq(), edges: Seq[Edge] = Seq()) {
     child
   }
 
-  new GraphCreator(svgNode,
-    nodes,
-    edges
-  )
+  Post[Api].layout(nodes, edges).call().foreach { gl =>
+    new GraphCreator(svgNode,
+      gl.tasks,
+      gl.edges
+    )
+  }
 }
 
-class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
+class GraphCreator(svg: SVGElement, _tasks: Seq[TaskData], _edges: Seq[EdgeData]) {
+
 
   implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
 
@@ -175,13 +201,13 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   defs.appendChild(endArrowMarker)
   defs.appendChild(markEndArrow)
 
-  lazy val tasks: Var[Seq[Var[Task]]] = Var(Seq())
+  lazy val tasks: Var[Seq[Task]] = Var(Seq())
   _tasks.map {
-    addTask
+    addTask(_)
   }
 
   // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
-   def circle(task: Task) = {
+  def circle(task: Task) = {
     val element: SVGElement = Rx {
       svgTags.g(
         ms(CIRCLE + {
@@ -213,21 +239,23 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     gCircle
   }
 
-  lazy val edges: Var[Seq[Var[Edge]]] = Var(Seq())
+  lazy val taskMap = tasks.now.groupBy(_.id)
+  lazy val edges: Var[Seq[Edge]] = Var(Seq())
   _edges.map { e =>
-    addEdge(edge(e.source.now, e.target.now))
+    addEdge(edge(taskMap(e.source.id).head, taskMap(e.target.id).head))
   }
 
   // DEFINE A LINK, WHICH CAN BE SELECTED AND REMOVED (DEL KEY)
   def link(edge: Edge) = {
     val sVGElement: SVGElement = Rx {
+      println("mouve link")
       val p = path(ms = (if (edge.selected()) ms(SELECTED) else emptyMod) +++
         ms(LINK)).m(
-        edge.source().location()._1.toInt,
-        edge.source().location()._2.toInt
+        edge.source.location()._1.toInt,
+        edge.source.location()._2.toInt
       ).l(
-        edge.target().location()._1.toInt,
-        edge.target().location()._2.toInt
+        edge.target.location()._1.toInt,
+        edge.target.location()._2.toInt
       ).render(svgAttrs.markerEnd := URL_END_ARROW).render
 
       p.onmousedown = (me: MouseEvent) => {
@@ -242,13 +270,13 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   }
 
   // ADD ALL LINKS AND CIRCLES ON THE SCENE. THE RX SEQUENCE IS AUTOMATICALLY RUN IN CASE OF tasks or edges ALTERATION
-  def addToScene[T](s: Var[Seq[Var[T]]], draw: T => SVGElement) = {
+  def addToScene[T](s: Var[Seq[T]], draw: T => SVGElement) = {
     val element: SVGElement = Rx {
       svgTags.g(
         for {
           t <- s()
         } yield {
-          draw(t.now)
+          draw(t)
         }
       )
     }
@@ -262,10 +290,10 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   dom.document.onkeydown = (e: KeyboardEvent) => {
     e.keyCode match {
       case DELETE_KEY ⇒
-        tasks.now.filter(t ⇒ t.now.selected.now).map { t ⇒
+        tasks.now.filter(t ⇒ t.selected.now).map { t ⇒
           removeTask(t)
         }
-        edges.now.filter(e ⇒ e.now.selected.now).map { e ⇒
+        edges.now.filter(e ⇒ e.selected.now).map { e ⇒
           removeEdge(e)
         }
       case _ ⇒
@@ -273,24 +301,24 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   }
 
   // ADD, SELECT AND REMOVE ITEMS
-  def unselectTasks = tasks.now.foreach { t ⇒ t.now.selected() = false }
+  def unselectTasks = tasks.now.foreach { t ⇒ t.selected() = false }
 
-  def unselectEdges = edges.now.foreach { e ⇒ e.now.selected() = false }
+  def unselectEdges = edges.now.foreach { e ⇒ e.selected() = false }
 
-  def removeTask(t: Var[Task]) = {
+  def removeTask(t: Task) = {
     tasks() = tasks.now diff Seq(t)
-    edges() = edges.now.filterNot(e ⇒ e.now.source.now == t.now || e.now.target.now == t.now)
+    edges() = edges.now.filterNot(e ⇒ e.source == t || e.target == t)
   }
 
-  def removeEdge(e: Var[Edge]) = {
+  def removeEdge(e: Edge) = {
     edges() = edges.now diff Seq(e)
   }
 
   def addTask(task: Task): Unit = {
-    tasks() = tasks.now :+ Var(task)
+    tasks() = tasks.now :+ task
   }
 
   def addEdge(edge: Edge): Unit = {
-    edges() = edges.now :+ Var(edge)
+    edges() = edges.now :+ edge
   }
 }

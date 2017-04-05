@@ -1,11 +1,17 @@
 package fr.iscpif.app
 
+import java.util.UUID
+
 import org.scalatra._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import upickle.default
 import autowire._
-import shared._
 import upickle._
+import at.ait.dme.forcelayout.{Edge, Node, SpringGraph}
+import fr.iscpif.app.tools._
+import ext._
+import shared.Data._
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import scalatags.Text.all._
@@ -16,12 +22,23 @@ object AutowireServer extends autowire.Server[String, upickle.default.Reader, up
   def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
 }
 
-object ApiImpl extends shared.Api {
+object ApiImpl extends ext.Api {
+
+  def layout(tasks: Seq[TaskData], edges: Seq[EdgeData]): GraphLayout = {
+    val graphNodes: Seq[Node] = tasks
+    val graphEdges: Seq[Edge] = edges
+
+    val graph = new SpringGraph(graphNodes, graphEdges)
+
+    graph.doLayout()
+
+    GraphLayout(graph.nodes, graph.edges)
+  }
 }
 
 class Servlet extends ScalatraServlet {
 
-  val basePath = "shared"
+  val basePath = "ext"
 
   get("/") {
     contentType = "text/html"
@@ -38,7 +55,7 @@ class Servlet extends ScalatraServlet {
   }
 
   post(s"/$basePath/*") {
-    Await.result(AutowireServer.route[shared.Api](ApiImpl)(
+    Await.result(AutowireServer.route[ext.Api](ApiImpl)(
       autowire.Core.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
         upickle.default.read[Map[String, String]](request.body))
     ), Duration.Inf)
