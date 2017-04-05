@@ -13,20 +13,14 @@ object Client {
 
   @JSExport
   def run() = {
-    val nodes = Seq(
-      TaskData(title = "one"),
-      TaskData(title = "two"),
-      TaskData(title = "three"),
-      TaskData(title = "four"),
-      TaskData(title = "five")
-    )
+    val nodes: Seq[TaskData] = for (t <- 0 to 100) yield {
+      TaskData(title = t.toString)
+    }
 
-    val edges = Seq(
-      EdgeData(nodes(0), nodes(1)),
-      EdgeData(nodes(0), nodes(2)),
-      EdgeData(nodes(3), nodes(1)),
-      EdgeData(nodes(3), nodes(2))
-    )
+    val r = scala.util.Random
+    val edges = for (e <- 0 to 100) yield {
+      EdgeData(nodes(r.nextInt(10)), nodes(r.nextInt(100)))
+    }
 
     new Window(nodes, edges)
   }
