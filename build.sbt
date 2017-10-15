@@ -5,17 +5,17 @@ import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 val Organization = "fr.iscpif"
 val Name = "ScalaWUI"
 val Version = "0.1.0-SNAPSHOT"
-val ScalaVersion = "2.11.8"
-val scalatraVersion = "2.5.0"
-val jettyVersion = "9.2.19.v20160908"
-val json4sVersion = "3.3.0"
-val scalatagsVersion = "0.6.3"
+val ScalaVersion = "2.12.3"
+val scalatraVersion = "2.5.1"
+val jettyVersion = "9.4.6.v20170531"
+val json4sVersion = "3.5.2"
+val scalatagsVersion = "0.6.5"
 val autowireVersion = "0.2.6"
-val upickleVersion = "0.4.1"
-val rxVersion = "0.3.1"
+val upickleVersion = "0.4.4"
+val rxVersion = "0.3.2"
 val scaladgetVersion = "0.9.4"
-val scalajsDomVersion = "0.9.1"
-val jqueryVersion = "2.2.1"
+val scalajsDomVersion = "0.9.3"
+val jqueryVersion = "3.2.1"
 val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
@@ -31,7 +31,7 @@ lazy val client = project.in(file("client")) settings(
   scalaVersion := ScalaVersion,
   resolvers in ThisBuild ++= Resolvers,
   skip in packageJSDependencies := false,
-  jsDependencies += "org.webjars" % "d3js" % "3.5.12" / "d3.min.js",
+  jsDependencies += "org.webjars" % "d3js" % "4.2.1" / "d3.min.js",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
     "com.lihaoyi" %%% "upickle" % upickleVersion,
