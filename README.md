@@ -7,6 +7,7 @@ The project aims at building a small but complete client / server application us
 - [scalatags](https://github.com/lihaoyi/scalatags)
 - [scala.rx](https://github.com/lihaoyi/scala.rx)
 - [autowire](https://github.com/lihaoyi/autowire)
+- [boopickle](https://github.com/suzaku-io/boopickle)
 
 as well as [scaladget](https://github.com/mathieuleclaire/scaladget) to draw some svg and display a [http://d3js.org/](D3.js)-like workflow.
 
