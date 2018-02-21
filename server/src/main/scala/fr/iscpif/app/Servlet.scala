@@ -1,23 +1,23 @@
 package fr.iscpif.app
 
+import java.nio.ByteBuffer
+
 import org.scalatra._
+
 import scala.concurrent.ExecutionContext.Implicits.global
-import upickle.default
-import autowire._
-import shared._
-import upickle._
+import boopickle.Default._
+
 import scala.concurrent.duration._
 import scala.concurrent.Await
 import scalatags.Text.all._
 import scalatags.Text.{all => tags}
 
-object AutowireServer extends autowire.Server[String, upickle.default.Reader, upickle.default.Writer] {
-  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
-  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
+object AutowireServer extends autowire.Server[ByteBuffer, Pickler, Pickler] {
+  override def read[R: Pickler](p: ByteBuffer) = Unpickle[R].fromBytes(p)
+
+  override def write[R: Pickler](r: R) = Pickle.intoBytes(r)
 }
 
-object ApiImpl extends shared.Api {
-}
 
 class Servlet extends ScalatraServlet {
 
@@ -33,15 +33,29 @@ class Servlet extends ScalatraServlet {
         tags.script(tags.`type` := "text/javascript", tags.src := "js/client-opt.js"),
         tags.script(tags.`type` := "text/javascript", tags.src := "js/client-jsdeps.min.js")
       ),
-      tags.body(tags.onload := "Client().run();")
+      tags.body(tags.onload := "run();")
     )
   }
 
   post(s"/$basePath/*") {
-    Await.result(AutowireServer.route[shared.Api](ApiImpl)(
-      autowire.Core.Request(Seq(basePath) ++ multiParams("splat").head.split("/"),
-        upickle.default.read[Map[String, String]](request.body))
-    ), Duration.Inf)
+    println("PAT " + basePath)
+    val req = Await.result({
+      val is = request.getInputStream
+      val bytes: Array[Byte] = Iterator.continually(is.read()).takeWhile(_ != -1).map(_.asInstanceOf[Byte]).toArray[Byte]
+      val bb = ByteBuffer.wrap(bytes)
+      AutowireServer.route[shared.Api](ApiImpl)(
+        autowire.Core.Request(
+          basePath.split("/").toSeq ++ multiParams("splat").head.split("/"),
+          Unpickle[Map[String, ByteBuffer]].fromBytes(bb)
+        )
+      )
+    },
+      Duration.Inf
+    )
+
+    val data = Array.ofDim[Byte](req.remaining)
+    req.get(data)
+    Ok(data)
   }
 
 }

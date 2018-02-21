@@ -1,26 +1,32 @@
 package client
 
+import java.nio.ByteBuffer
+
 import org.scalajs.dom
+
 import scala.concurrent.Future
 import rx._
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.concurrent.JSExecutionContext.Implicits.runNow
+
+import scala.scalajs.js.annotation.JSExportTopLevel
+import boopickle.Default._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.scalajs.js.typedarray.{ArrayBuffer, TypedArrayBuffer}
 
 
-@JSExport("Client")
 object Client {
 
   val helloValue = Var(0)
   val caseClassValue = Var("empty")
 
-  @JSExport
+  @JSExportTopLevel("run")
   def run() {
     val nodes = Seq(
-      Graph.task("one", 400, 600),
-      Graph.task("two", 1000, 600),
-      Graph.task("three", 400, 100),
-      Graph.task("four", 1000, 100),
-      Graph.task("five", 105, 60)
+      Graph.task("0", "one", 400, 600),
+      Graph.task("1", "two", 1000, 600),
+      Graph.task("2", "three", 400, 100),
+      Graph.task("3", "four", 1000, 100),
+      Graph.task("4", "five", 105, 60)
     )
     val edges = Seq(
       Graph.edge(nodes(0), nodes(1)),
@@ -31,19 +37,19 @@ object Client {
   }
 }
 
-object Post extends autowire.Client[String, upickle.default.Reader, upickle.default.Writer] {
+object Post extends autowire.Client[ByteBuffer, Pickler, Pickler] {
 
-  override def doCall(req: Request): Future[String] = {
-    val url = req.path.mkString("/")
+  override def doCall(req: Request): Future[ByteBuffer] = {
     dom.ext.Ajax.post(
-      url = "http://localhost:8080/" + url,
-      data = upickle.default.write(req.args)
-    ).map {
-      _.responseText
-    }
+      url = req.path.mkString("/"),
+      data = Pickle.intoBytes(req.args),
+      responseType = "arraybuffer",
+      headers = Map("Content-Type" -> "application/octet-stream")
+    ).map(r => TypedArrayBuffer.wrap(r.response.asInstanceOf[ArrayBuffer]))
   }
 
-  def read[Result: upickle.default.Reader](p: String) = upickle.default.read[Result](p)
+  override def read[Result: Pickler](p: ByteBuffer) = Unpickle[Result].fromBytes(p)
 
-  def write[Result: upickle.default.Writer](r: Result) = upickle.default.write(r)
+  override def write[Result: Pickler](r: Result) = Pickle.intoBytes(r)
+
 }

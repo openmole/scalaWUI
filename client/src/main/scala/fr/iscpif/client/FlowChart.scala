@@ -28,6 +28,10 @@ import scaladget.stylesheet.all._
 import scaladget.api.svg._
 import scaladget.tools.JsRxTags._
 import org.scalajs.dom.raw._
+import shared.Api
+import boopickle.Default._
+import scala.concurrent.ExecutionContext.Implicits.global
+import autowire._
 
 trait Selectable {
   val selected: Var[Boolean] = Var(false)
@@ -36,13 +40,14 @@ trait Selectable {
 // DEFINE SOME CASE CLASS TO STORE TASK AND EDGE STRUCTURES
 object Graph {
 
-  case class Task(title: Var[String] = Var(""),
+  case class Task(id: String,
+                  title: Var[String] = Var(""),
                   location: Var[(Double, Double)] = Var((0.0, 0.0))) extends Selectable
 
   class Edge(val source: Var[Task],
              val target: Var[Task]) extends Selectable
 
-  def task(title: String, x: Double, y: Double) = Task(Var(title), Var((x, y)))
+  def task(id: String, title: String, x: Double, y: Double) = Task(id, Var(title), Var((x, y)))
 
   def edge(source: Task, target: Task) = new Edge(Var(source), Var(target))
 }
@@ -145,7 +150,10 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     // Hide the drag line
     if (me.shiftKey && !dragLine.dragging.now) {
       val (x, y) = (me.clientX, me.clientY)
-      addTask(task(UUID.randomUUID().toString, x, y))
+      Post[Api].uuid().call().foreach { i =>
+        println("I " + i)
+        addTask(task(i, i, x, y))
+      }
     }
     mouseDownTask() = None
     dragLine.dragging() = false
@@ -181,7 +189,7 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   }
 
   // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
-   def circle(task: Task) = {
+  def circle(task: Task) = {
     val element: SVGElement = Rx {
       svgTags.g(
         ms(CIRCLE + {
