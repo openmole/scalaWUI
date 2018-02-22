@@ -20,14 +20,13 @@ val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
 
 lazy val shared = project.in(file("shared")).settings(
   scalaVersion := ScalaVersion
-)
+) enablePlugins (ScalaJSPlugin)
 
 lazy val client = project.in(file("client")) settings(
   version := Version,
   scalaVersion := ScalaVersion,
   resolvers in ThisBuild ++= Resolvers,
   skip in packageJSDependencies := false,
-  jsDependencies += "org.webjars" % "d3js" % "4.2.1" / "d3.min.js",
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
     "io.suzaku" %%% "boopickle" % boopickleVersion,
@@ -50,7 +49,6 @@ lazy val server = project.in(file("server")) settings(
     "io.suzaku" %% "boopickle" % boopickleVersion,
     "com.lihaoyi" %% "scalatags" % scalatagsVersion,
     "org.scalatra" %% "scalatra" % scalatraVersion,
-    //"se.scalablesolutions.akka" %% "akka-util" % "0.8.1",
     "ch.qos.logback" % "logback-classic" % "1.1.3" % "runtime",
     "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
     "org.eclipse.jetty" % "jetty-webapp" % jettyVersion,
