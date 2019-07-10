@@ -24,8 +24,8 @@ import rx._
 import scalatags.JsDom.all._
 import scalatags.JsDom.svgAttrs
 import scalatags.JsDom.svgTags
-import scaladget.stylesheet.all._
-import scaladget.api.svg._
+import scaladget.bootstrapnative.bsn._
+import scaladget.svg.path._
 import scaladget.tools.JsRxTags._
 import org.scalajs.dom.raw._
 import shared.Api
@@ -106,9 +106,9 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     }
 
     val render: SVGElement = Rx {
-      path(ms = ms(s"$LINK_DRAGLINE ${
+      scaladget.svg.path.Path().m(m()._1, m()._2).l(l()._1, l()._2)(svgAttrs.markerEnd := URL_MARK_END_ARROW, `class` := s"$LINK_DRAGLINE ${
         if (dragging()) "" else HIDDEN
-      }")).m(m()._1, m()._2).l(l()._1, l()._2)(svgAttrs.markerEnd := URL_MARK_END_ARROW).render
+      }").render
     }
   }
 
@@ -135,10 +135,10 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
 
   def mousemove(me: MouseEvent) = {
     Seq(mouseDownTask.now).flatten.map { t ⇒
-      val x = me.clientX.toInt
-      val y = me.clientY.toInt
+      val x = me.clientX
+      val y = me.clientY
       if (me.shiftKey) {
-        dragLine.move(t.location.now._1.toInt, t.location.now._2.toInt).line(x, y)
+        dragLine.move(t.location.now._1.toInt, t.location.now._2.toInt).line(x.toInt, y.toInt)
       }
       else {
         t.location() = (x, y)
@@ -171,13 +171,13 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   def endArrowMarker = arrow(
     id := END_ARROW,
     svgAttrs.refX := 32,
-    path.start(0, -5).l(10, 0).l(0, 5).render
+    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
   ).render
 
   def markEndArrow = arrow(
     id := MARK_END_ARROW,
     svgAttrs.refX := 7,
-    path.start(0, -5).l(10, 0).l(0, 5).render
+    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
   ).render
 
   defs.appendChild(endArrowMarker)
@@ -191,10 +191,10 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
   def circle(task: Task) = {
     val element: SVGElement = Rx {
-      svgTags.g(
-        ms(CIRCLE + {
+      svgTags.g(`class` :=
+        CIRCLE + {
           if (task.selected()) s" $SELECTED" else ""
-        })
+        }
       )(
         svgAttrs.transform := s"translate(${
           val location = task.location()
@@ -229,14 +229,14 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   // DEFINE A LINK, WHICH CAN BE SELECTED AND REMOVED (DEL KEY)
   def link(edge: Edge) = {
     val sVGElement: SVGElement = Rx {
-      val p = path(ms = (if (edge.selected()) ms(SELECTED) else emptyMod) +++
-        ms(LINK)).m(
+      val p = Path().m(
         edge.source().location()._1.toInt,
         edge.source().location()._2.toInt
       ).l(
         edge.target().location()._1.toInt,
         edge.target().location()._2.toInt
-      ).render(svgAttrs.markerEnd := URL_END_ARROW).render
+      ).render(svgAttrs.markerEnd := URL_END_ARROW, `class` := (if (edge.selected()) SELECTED else "") +
+        LINK).render
 
       p.onmousedown = (me: MouseEvent) => {
         unselectTasks

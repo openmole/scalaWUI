@@ -1,28 +1,30 @@
-import java.io.File
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
 val Organization = "fr.iscpif"
 val Name = "ScalaWUI"
 val Version = "0.1.0-SNAPSHOT"
-val ScalaVersion = "2.12.4"
-val scalatraVersion = "2.5.1"
-val jettyVersion = "9.4.6.v20170531"
-val json4sVersion = "3.5.2"
-val scalatagsVersion = "0.6.7"
+val ScalaVersion = "2.12.8"
+val scalatraVersion = "2.6.5"
+val jettyVersion = "9.4.19.v20190610"
+val json4sVersion = "3.6.3"
+val scalatagsVersion = "0.7.0"
 val autowireVersion = "0.2.6"
-val boopickleVersion = "1.2.6"
-val rxVersion = "0.3.2"
-val scaladgetVersion = "0.9.4"
-val scalajsDomVersion = "0.9.3"
+val boopickleVersion = "1.3.1"
+val rxVersion = "0.4.0"
+val scaladgetVersion = "1.2.7"
+val scalajsDomVersion = "0.9.7"
 val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
   "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
 )
 
-lazy val shared = project.in(file("shared")).settings(
+lazy val shared = project.in(file("shared")) settings(
   scalaVersion := ScalaVersion
 ) enablePlugins (ScalaJSPlugin)
 
-lazy val client = project.in(file("client")) settings(
+
+lazy val go = taskKey[Unit]("go")
+
+lazy val client = project.in(file("client")) enablePlugins (ExecNpmPlugin) settings(
   version := Version,
   scalaVersion := ScalaVersion,
   resolvers in ThisBuild ++= Resolvers,
@@ -32,11 +34,13 @@ lazy val client = project.in(file("client")) settings(
     "io.suzaku" %%% "boopickle" % boopickleVersion,
     "com.lihaoyi" %%% "scalatags" % scalatagsVersion,
     "com.lihaoyi" %%% "scalarx" % rxVersion,
-    "fr.iscpif" %%% "scaladget" % scaladgetVersion,
+    "fr.iscpif.scaladget" %%% "tools" % scaladgetVersion,
+    "fr.iscpif.scaladget" %%% "svg" % scaladgetVersion,
+    "fr.iscpif.scaladget" %%% "bootstrapnative" % scaladgetVersion,
     "org.scala-js" %%% "scalajs-dom" % scalajsDomVersion,
     "org.json4s" %% "json4s-jackson" % json4sVersion
   )
-) dependsOn (shared) enablePlugins (ScalaJSPlugin)
+) dependsOn (shared)
 
 lazy val server = project.in(file("server")) settings(
   organization := Organization,
@@ -56,39 +60,21 @@ lazy val server = project.in(file("server")) settings(
   )
 ) dependsOn (shared) enablePlugins (ScalatraPlugin)
 
-lazy val go = taskKey[Unit]("go")
 
 lazy val bootstrap = project.in(file("target/bootstrap")) settings(
   version := Version,
   scalaVersion := ScalaVersion,
   go := {
-    val clientTarget = (fullOptJS in client in Compile).value
-    val clientResource = (resourceDirectory in client in Compile).value
-    val serverTarget = (target in server in Compile).value
 
-    copy(clientTarget, clientResource, new File(serverTarget, "webapp"))
-  }
-) dependsOn(client, server)
+      val jsBuild = (fullOptJS in client in Compile).value.data
+      val demoTarget = (target in server in Compile).value
 
-def copy(clientTarget: Attributed[File], resources: File, webappServerTarget: File) = {
-  clientTarget.map { ct =>
-    val depName = ct.getName.replace("opt.js", "jsdeps.min.js")
-    recursiveCopy(new File(resources, "webapp"), webappServerTarget)
-    recursiveCopy(ct, new File(webappServerTarget, "js/" + ct.getName))
-    recursiveCopy(new File(ct.getParent, depName), new File(webappServerTarget, "js/" + depName))
-  }
-}
+      val demoResource = (resourceDirectory in client in Compile).value
+      val dependencyJS = (dependencyFile in client in Compile).value
+      val depsCSS = (cssFile in client in Compile).value
 
-def recursiveCopy(from: File, to: File): Unit = {
-  if (from.isDirectory) {
-    to.mkdirs()
-    for {
-      f ← from.listFiles()
-    } recursiveCopy(f, new File(to, f.getName))
-  }
-  else if (!to.exists() || from.lastModified() > to.lastModified) {
-    println(s"Copy file $from to $to ")
-    from.getParentFile.mkdirs
-    IO.copyFile(from, to, preserveLastModified = true)
-  }
-}
+      IO.copyFile(jsBuild, demoTarget / "webapp/js/demo.js")
+      IO.copyFile(dependencyJS, demoTarget / "webapp/js/deps.js")
+      IO.copyDirectory(depsCSS, demoTarget / "webapp/css")
+      IO.copyDirectory(demoResource, demoTarget)
+  }) dependsOn(client, server)
