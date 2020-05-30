@@ -1,4 +1,4 @@
-import fr.iscpif.app._
+import org.openmole.app._
 import org.scalatra._
 import javax.servlet.ServletContext
 

@@ -1,4 +1,4 @@
-package fr.iscpif.app
+package org.openmole.app
 
 import java.nio.ByteBuffer
 
@@ -39,7 +39,6 @@ class Servlet extends ScalatraServlet {
   }
 
   post(s"/$basePath/*") {
-    println("PAT " + basePath)
     val req = Await.result({
       val is = request.getInputStream
       val bytes: Array[Byte] = Iterator.continually(is.read()).takeWhile(_ != -1).map(_.asInstanceOf[Byte]).toArray[Byte]

@@ -87,6 +87,12 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   val MARK_END_ARROW: String = "mark-end-arrow"
   val URL_MARK_END_ARROW: String = s"url(#${MARK_END_ARROW})"
 
+  // Test Case class
+  Post[Api].foo().call().foreach{f=>
+    println("Bar " + f.bar)
+  }
+
+
   // DEFINE A SVG ELEMENT TO DISPLAY A PHANTOM LINK WHILE DRAGGING A LINK FROM ONE TASK TO ANOTHER
   class DragLine {
     private val m: Var[(Int, Int)] = Var((0, 0))

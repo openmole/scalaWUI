@@ -1,5 +1,8 @@
 # ScalaWUI (Scala Web UI)#
 
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.0.0.svg)](https://www.scala-js.org/)
+
+
 The project aims at building a small but complete client / server application using very powerfull scala tools to construct fully typed and reactive Web applications. Among them:
 
 - [scalajs](https://github.com/scala-js/scala-js)

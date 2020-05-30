@@ -1,9 +1,10 @@
-package fr.iscpif.app
+package org.openmole.app
 
 object ApiImpl extends shared.Api {
 
   def uuid(): String = {
-    println("UUUUUID")
     java.util.UUID.randomUUID.toString
   }
+
+  def foo(): shared.Data.Foo = new shared.Data.Foo(7)
 }

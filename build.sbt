@@ -1,21 +1,18 @@
 import org.scalajs.sbtplugin.ScalaJSPlugin.autoImport._
 
-val Organization = "fr.iscpif"
+val Organization = "org.openmole"
 val Name = "ScalaWUI"
-val Version = "0.1.0-SNAPSHOT"
-val ScalaVersion = "2.12.8"
-val scalatraVersion = "2.6.5"
-val jettyVersion = "9.4.19.v20190610"
-val json4sVersion = "3.6.3"
-val scalatagsVersion = "0.7.0"
-val autowireVersion = "0.2.6"
-val boopickleVersion = "1.3.1"
-val rxVersion = "0.4.0"
-val scaladgetVersion = "1.2.7"
-val scalajsDomVersion = "0.9.7"
-val Resolvers = Seq(Resolver.sonatypeRepo("snapshots"),
-  "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
-)
+val Version = "0.3"
+val ScalaVersion = "2.13.2"
+val scalatraVersion = "2.7.0"
+val jettyVersion = "9.4.28.v20200408"
+val json4sVersion = "3.6.7"
+val scalatagsVersion = "0.9.1"
+val autowireVersion = "0.3.2"
+val boopickleVersion = "1.3.2"
+val rxVersion = "0.4.2"
+val scaladgetVersion = "1.3.0"
+val scalajsDomVersion = "1.0.0"
 
 lazy val shared = project.in(file("shared")) settings(
   scalaVersion := ScalaVersion
@@ -27,7 +24,6 @@ lazy val go = taskKey[Unit]("go")
 lazy val client = project.in(file("client")) enablePlugins (ExecNpmPlugin) settings(
   version := Version,
   scalaVersion := ScalaVersion,
-  resolvers in ThisBuild ++= Resolvers,
   skip in packageJSDependencies := false,
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
@@ -47,7 +43,6 @@ lazy val server = project.in(file("server")) settings(
   name := Name,
   version := Version,
   scalaVersion := ScalaVersion,
-  resolvers ++= Resolvers,
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "autowire" % autowireVersion,
     "io.suzaku" %% "boopickle" % boopickleVersion,
