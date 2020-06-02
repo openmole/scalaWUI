@@ -1,4 +1,4 @@
-# ScalaWUI (Scala Web UI)#
+# ScalaWUI (Scala Web UI)
 
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-1.0.0.svg)](https://www.scala-js.org/)
 
