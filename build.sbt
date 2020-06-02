@@ -11,7 +11,7 @@ val scalatagsVersion = "0.9.1"
 val autowireVersion = "0.3.2"
 val boopickleVersion = "1.3.2"
 val rxVersion = "0.4.2"
-val scaladgetVersion = "1.3.0"
+val scaladgetVersion = "1.3.3"
 val scalajsDomVersion = "1.0.0"
 
 lazy val shared = project.in(file("shared")) settings(
@@ -30,9 +30,9 @@ lazy val client = project.in(file("client")) enablePlugins (ExecNpmPlugin) setti
     "io.suzaku" %%% "boopickle" % boopickleVersion,
     "com.lihaoyi" %%% "scalatags" % scalatagsVersion,
     "com.lihaoyi" %%% "scalarx" % rxVersion,
-    "fr.iscpif.scaladget" %%% "tools" % scaladgetVersion,
-    "fr.iscpif.scaladget" %%% "svg" % scaladgetVersion,
-    "fr.iscpif.scaladget" %%% "bootstrapnative" % scaladgetVersion,
+    "org.openmole.scaladget" %%% "tools" % scaladgetVersion,
+    "org.openmole.scaladget" %%% "svg" % scaladgetVersion,
+    "org.openmole.scaladget" %%% "bootstrapnative" % scaladgetVersion,
     "org.scala-js" %%% "scalajs-dom" % scalajsDomVersion,
     "org.json4s" %% "json4s-jackson" % json4sVersion
   )
