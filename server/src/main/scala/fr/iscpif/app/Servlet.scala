@@ -34,7 +34,7 @@ class Servlet extends ScalatraServlet {
         tags.script(tags.`type` := "text/javascript", tags.src := "js/deps.js"),
         tags.script(tags.`type` := "text/javascript", tags.src := "js/demo.js")
       ),
-      tags.body(tags.onload := "run();")
+    //  body(onload := "run();")
     )
   }
 

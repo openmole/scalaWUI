@@ -17,21 +17,18 @@ package client
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.UUID
-import org.scalajs.dom
-import scala.scalajs.js
-import rx._
-import scalatags.JsDom.all._
-import scalatags.JsDom.svgAttrs
-import scalatags.JsDom.svgTags
+
 import scaladget.bootstrapnative.bsn._
-import scaladget.svg.path._
-import scaladget.tools.JsRxTags._
-import org.scalajs.dom.raw._
-import shared.Api
-import boopickle.Default._
+import com.raquo.laminar.api.L._
+import com.raquo.laminar.api.L.svg
+import com.raquo.domtypes.jsdom.defs.events.TypedTargetMouseEvent
+import org.scalajs
+import org.scalajs.dom.{KeyboardEvent, raw}
 import scala.concurrent.ExecutionContext.Implicits.global
 import autowire._
+import boopickle.Default._
+
+import scala.scalajs.js.Dynamic
 
 trait Selectable {
   val selected: Var[Boolean] = Var(false)
@@ -40,40 +37,20 @@ trait Selectable {
 // DEFINE SOME CASE CLASS TO STORE TASK AND EDGE STRUCTURES
 object Graph {
 
-  case class Task(id: String,
-                  title: Var[String] = Var(""),
+  case class Task(title: Var[String] = Var(""),
                   location: Var[(Double, Double)] = Var((0.0, 0.0))) extends Selectable
 
   class Edge(val source: Var[Task],
              val target: Var[Task]) extends Selectable
 
-  def task(id: String, title: String, x: Double, y: Double) = Task(id, Var(title), Var((x, y)))
+  def task(title: String, x: Double, y: Double) = Task(Var(title), Var((x, y)))
 
   def edge(source: Task, target: Task) = new Edge(Var(source), Var(target))
 }
 
 import Graph._
 
-class Window(nodes: Seq[Task] = Seq(), edges: Seq[Edge] = Seq()) {
-
-  val svgNode = {
-    val child = svgTags.svg(
-      width := 2500,
-      height := 2500
-    ).render
-    dom.document.body.appendChild(child.render)
-    child
-  }
-
-  new GraphCreator(svgNode,
-    nodes,
-    edges
-  )
-}
-
-class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
-
-  implicit val ctx: Ctx.Owner = Ctx.Owner.safe()
+class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
 
   val SELECTED: String = "selected"
   val CIRCLE: String = "conceptG"
@@ -87,12 +64,6 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
   val MARK_END_ARROW: String = "mark-end-arrow"
   val URL_MARK_END_ARROW: String = s"url(#${MARK_END_ARROW})"
 
-  // Test Case class
-  Post[Api].foo().call().foreach{f=>
-    println("Bar " + f.bar)
-  }
-
-
   // DEFINE A SVG ELEMENT TO DISPLAY A PHANTOM LINK WHILE DRAGGING A LINK FROM ONE TASK TO ANOTHER
   class DragLine {
     private val m: Var[(Int, Int)] = Var((0, 0))
@@ -100,211 +71,214 @@ class GraphCreator(svg: SVGElement, _tasks: Seq[Task], _edges: Seq[Edge]) {
     val dragging = Var(false)
 
     def move(x: Int, y: Int) = {
-      dragging() = true
-      m() = (x, y)
+      dragging.set(true)
+      m.set((x, y))
       this
     }
 
     def line(x: Int, y: Int) = {
-      dragging() = true
-      l() = (x, y)
+      dragging.set(true)
+      l.set((x, y))
       this
     }
 
-    val render: SVGElement = Rx {
-      scaladget.svg.path.Path().m(m()._1, m()._2).l(l()._1, l()._2)(svgAttrs.markerEnd := URL_MARK_END_ARROW, `class` := s"$LINK_DRAGLINE ${
-        if (dragging()) "" else HIDDEN
-      }").render
+    val render = {
+      svg.path(
+        svg.d <-- m.signal.combineWith(l.signal).map { case (mx, my, lx, ly) => s"M $mx $my L $lx $ly" },
+        svg.markerEnd := URL_MARK_END_ARROW,
+        svg.cls := LINK_DRAGLINE,
+        svg.cls.toggle(HIDDEN) <-- dragging.signal.map {
+          !_
+        }
+      )
     }
   }
 
-  implicit def dynamicToString(d: js.Dynamic): String = d.asInstanceOf[String]
+  implicit def dynamicToString(d: Dynamic): String = d.asInstanceOf[String]
 
-  implicit def dynamicToBoolean(d: js.Dynamic): Boolean = d.asInstanceOf[Boolean]
+  implicit def dynamicToBoolean(d: Dynamic): Boolean = d.asInstanceOf[Boolean]
 
   // SVG DEFINITIONS
-  val svgG = svgTags.g.render
-  val defs = svgTags.defs.render
+  lazy val dragLine = new DragLine
 
-  val dragLine = new DragLine
-
-  svgG.appendChild(dragLine.render)
-  svg.appendChild(svgG)
-  svg.appendChild(defs)
-
-  val mouseDownTask: Var[Option[Task]] = Var(None)
-  val dragging: Var[Option[DragLine]] = Var(None)
-
-  // EVENT DEFINITIONS FOR MOUSEUP AND MOUSEDOWN ON THE SCENE
-  svg.onmousemove = (me: MouseEvent) => mousemove(me)
-  svg.onmouseup = (me: MouseEvent) => mouseup(me)
-
-  def mousemove(me: MouseEvent) = {
-    Seq(mouseDownTask.now).flatten.map { t ⇒
-      val x = me.clientX
-      val y = me.clientY
-      if (me.shiftKey) {
-        dragLine.move(t.location.now._1.toInt, t.location.now._2.toInt).line(x.toInt, y.toInt)
-      }
-      else {
-        t.location() = (x, y)
-      }
-    }
-  }
-
-  def mouseup(me: MouseEvent) = {
-    // Hide the drag line
-    if (me.shiftKey && !dragLine.dragging.now) {
-      val (x, y) = (me.clientX, me.clientY)
-      Post[Api].uuid().call().foreach { i =>
-        println("I " + i)
-        addTask(task(i, i, x, y))
-      }
-    }
-    mouseDownTask() = None
-    dragLine.dragging() = false
-  }
-
-  // ARROW MARKERS FOR GRAPH LINKS
-  def arrow = svgTags.marker(
-    svgAttrs.viewBox := "0 -5 10 10",
-    svgAttrs.markerWidth := "3.5",
-    svgAttrs.markerHeight := "3.5",
-    svgAttrs.orient := "auto",
-    svgAttrs.refX := 32
-  )
-
-  def endArrowMarker = arrow(
-    id := END_ARROW,
-    svgAttrs.refX := 32,
-    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
-  ).render
-
-  def markEndArrow = arrow(
-    id := MARK_END_ARROW,
-    svgAttrs.refX := 7,
-    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
-  ).render
-
-  defs.appendChild(endArrowMarker)
-  defs.appendChild(markEndArrow)
-
-  lazy val tasks: Var[Seq[Var[Task]]] = Var(Seq())
+  val tasks: Var[Seq[Task]] = Var(Seq())
   _tasks.map {
     addTask
   }
 
-  // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
-  def circle(task: Task) = {
-    val element: SVGElement = Rx {
-      svgTags.g(`class` :=
-        CIRCLE + {
-          if (task.selected()) s" $SELECTED" else ""
-        }
-      )(
-        svgAttrs.transform := s"translate(${
-          val location = task.location()
-          s"${location._1}, ${location._2}"
-        })")(svgTags.circle(svgAttrs.r := NODE_RADIUS).render)
-    }
-    val gCircle = svgTags.g(element).render
-
-    gCircle.onmousedown = (me: MouseEvent) => {
-      mouseDownTask() = Some(task)
-      me.stopPropagation
-      unselectTasks
-      unselectEdges
-      task.selected() = !task.selected.now
-    }
-
-    gCircle.onmouseup = (me: MouseEvent) => {
-      Seq(mouseDownTask.now).flatten.map { mdt ⇒
-        if (task != mdt) {
-          addEdge(edge(mdt, task))
-        }
-      }
-    }
-    gCircle
-  }
-
-  lazy val edges: Var[Seq[Var[Edge]]] = Var(Seq())
+  val edges: Var[Seq[Edge]] = Var(Seq())
   _edges.map { e =>
     addEdge(edge(e.source.now, e.target.now))
   }
 
-  // DEFINE A LINK, WHICH CAN BE SELECTED AND REMOVED (DEL KEY)
-  def link(edge: Edge) = {
-    val sVGElement: SVGElement = Rx {
-      val p = Path().m(
-        edge.source().location()._1.toInt,
-        edge.source().location()._2.toInt
-      ).l(
-        edge.target().location()._1.toInt,
-        edge.target().location()._2.toInt
-      ).render(svgAttrs.markerEnd := URL_END_ARROW, `class` := (if (edge.selected()) SELECTED else "") +
-        LINK).render
-
-      p.onmousedown = (me: MouseEvent) => {
-        unselectTasks
-        unselectEdges
-        edge.selected() = !edge.selected.now
+  val svgG = svg.g(
+    dragLine.render,
+    svg.g(
+      children <-- tasks.signal.combineWith(edges).map { case (t, e) =>
+        e.map(link) ++ t.map(circle)
       }
-      p
-    }
+    )
+  )
 
-    svgTags.g(sVGElement).render
+  val mouseDownTask: Var[Option[Task]] = Var(None)
+  val dragging: Var[Option[DragLine]] = Var(None)
+
+
+  def mousemove(me: TypedTargetMouseEvent[raw.Element]) = {
+    Seq(mouseDownTask.now).flatten.map {
+      t ⇒
+        val x = me.clientX
+        val y = me.clientY
+        if (me.shiftKey) {
+          dragLine.move(t.location.now._1.toInt, t.location.now._2.toInt).line(x.toInt, y.toInt)
+        }
+        else {
+          t.location.set((x, y))
+        }
+    }
   }
 
-  // ADD ALL LINKS AND CIRCLES ON THE SCENE. THE RX SEQUENCE IS AUTOMATICALLY RUN IN CASE OF tasks or edges ALTERATION
-  def addToScene[T](s: Var[Seq[Var[T]]], draw: T => SVGElement) = {
-    val element: SVGElement = Rx {
-      svgTags.g(
-        for {
-          t <- s()
-        } yield {
-          draw(t.now)
+  def mouseup(me: TypedTargetMouseEvent[raw.Element]) = {
+    // Hide the drag line
+    if (me.shiftKey && !dragLine.dragging.now) {
+      val (x, y) = (me.clientX, me.clientY)
+      Post[shared.Api].uuid().call().foreach { i =>
+        println("I " + i)
+        addTask(task(i, x, y))
+      }
+    }
+    mouseDownTask.set(None)
+    dragLine.dragging.set(false)
+  }
+
+  // ARROW MARKERS FOR GRAPH LINKS
+  def arrow = svg.marker(
+    svg.viewBox := "0 -5 10 10",
+    svg.markerWidth := "3.5",
+    svg.markerHeight := "3.5",
+    svg.orient := "auto",
+    svg.refX := "32"
+  )
+
+  def endArrowMarker = arrow.amend(
+    svg.idAttr := END_ARROW,
+    svg.refX := "32",
+    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
+  )
+
+  def markEndArrow = arrow.amend(
+    svg.idAttr := MARK_END_ARROW,
+    svg.refX := "7",
+    scaladget.svg.path.start(0, -5).l(10, 0).l(0, 5).render
+  )
+
+  val defs = svg.defs(
+    endArrowMarker,
+    markEndArrow
+  )
+
+  // RETURN A SVG CIRCLE, WHICH CAN BE SELECTED (ON CLICK), MOVED OR DELETED (DEL KEY)
+  def circle(task: Task) = {
+    val element: SvgElement =
+      svg.g(
+        svg.cls := CIRCLE,
+        svg.cls.toggle((SELECTED)) <-- task.selected.signal,
+        svg.transform <-- task.location.signal.map {
+          l =>
+            s"translate(${
+              l._1
+            },${
+              l._2
+            })"
+        },
+        svg.circle(svg.r := NODE_RADIUS.toString)
+      )
+
+
+    val gCircle = svg.g(
+      element,
+      onMouseDown --> {
+        me =>
+          mouseDownTask.set(Some(task))
+          me.stopPropagation()
+          unselectTasks
+          unselectEdges
+          task.selected.update(!_)
+      },
+      onMouseUp --> {
+        _ =>
+          Seq(mouseDownTask.now).flatten.map {
+            mdt ⇒
+              if (task != mdt) {
+                addEdge(edge(mdt, task))
+              }
+          }
+      }
+    )
+    gCircle
+  }
+
+  // DEFINE A LINK, WHICH CAN BE SELECTED AND REMOVED (DEL KEY)
+  def link(edge: Edge) =
+    svg.g(
+      svg.path(
+        svg.d <-- edge.source.signal.map(_.location).combineWith(edge.target.signal.map(_.location)).map {
+          case (source, target) =>
+            source.signal.combineWith(target.signal).map {
+              case (sx, sy, tx, ty) =>
+                s"M $sx $sy L $tx $ty"
+            }
+        }.flatten,
+        svg.markerEnd := URL_END_ARROW,
+        svg.cls := LINK,
+        svg.cls.toggle(SELECTED) <-- edge.selected.signal,
+        onMouseDown --> {
+          _ =>
+            unselectTasks
+            unselectEdges
+            edge.selected.update(!_)
         }
       )
-    }
-    svgG.appendChild(svgTags.g(element).render).render
-  }
+    )
 
-  addToScene(edges, link)
-  addToScene(tasks, circle)
+  val svgNode = svg.svg(
+    svg.width := "2500",
+    svg.height := "2500",
+    defs,
+    svgG,
+    onMouseMove --> (me => mousemove(me)),
+    onMouseUp --> (me => mouseup(me))
+  )
 
   // DEAL WITH DEL KEY ACTION
-  dom.document.onkeydown = (e: KeyboardEvent) => {
+  scalajs.dom.document.onkeydown = (e: KeyboardEvent) => {
     e.keyCode match {
       case DELETE_KEY ⇒
-        tasks.now.filter(t ⇒ t.now.selected.now).map { t ⇒
-          removeTask(t)
-        }
-        edges.now.filter(e ⇒ e.now.selected.now).map { e ⇒
-          removeEdge(e)
-        }
+        tasks.now.filter(t ⇒ t.selected.now).map(t ⇒ removeTask(t))
+        edges.now.filter(e ⇒ e.selected.now).map(e ⇒ removeEdge(e))
       case _ ⇒
     }
   }
 
   // ADD, SELECT AND REMOVE ITEMS
-  def unselectTasks = tasks.now.foreach { t ⇒ t.now.selected() = false }
-
-  def unselectEdges = edges.now.foreach { e ⇒ e.now.selected() = false }
-
-  def removeTask(t: Var[Task]) = {
-    tasks() = tasks.now diff Seq(t)
-    edges() = edges.now.filterNot(e ⇒ e.now.source.now == t.now || e.now.target.now == t.now)
+  def unselectTasks = tasks.now.foreach {
+    t ⇒ t.selected.set(false)
   }
 
-  def removeEdge(e: Var[Edge]) = {
-    edges() = edges.now diff Seq(e)
+  def unselectEdges = edges.now.foreach {
+    e ⇒ e.selected.set(false)
   }
 
-  def addTask(task: Task): Unit = {
-    tasks() = tasks.now :+ Var(task)
+  def removeTask(t: Task) = {
+    tasks.update(ts => ts diff Seq(t))
+    edges.update {
+      es => es.filterNot(e ⇒ e.source.now == t || e.target.now == t)
+    }
   }
 
-  def addEdge(edge: Edge): Unit = {
-    edges() = edges.now :+ Var(edge)
-  }
+  def removeEdge(e: Edge) = edges.update(es => es diff Seq(e))
+
+  def addTask(task: Task): Unit = tasks.update(ts => ts :+ task)
+
+  def addEdge(edge: Edge): Unit = edges.update(es => es :+ edge)
 }
