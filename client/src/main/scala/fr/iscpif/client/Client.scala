@@ -11,10 +11,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.scalajs.js.typedarray.{ArrayBuffer, TypedArrayBuffer}
 import com.raquo.laminar.api.L._
 
+import scala.scalajs.js.annotation.{JSExportAll, JSExportTopLevel}
+
+@JSExportTopLevel (name="scalaWui")
+@JSExportAll
 object App {
 
-  def main(args: Array[String]): Unit = {
+  //def main(args: Array[String]): Unit = {
 
+  def graph() = {
     val nodes = Seq(
       Graph.task("one", 400, 600),
       Graph.task("two", 1000, 600),
@@ -30,10 +35,9 @@ object App {
 
     val graphCreator = new GraphCreator(nodes, edges)
 
-    documentEvents.onDomContentLoaded.foreach { _ =>
-      render(scalajs.dom.document.body, div(graphCreator.svgNode))
-    }(unsafeWindowOwner)
+    val containerNode = dom.document.querySelector("#scalaWUI-content")
 
+    render(containerNode, graphCreator.svgNode)
   }
 }
 

@@ -31,10 +31,12 @@ class Servlet extends ScalatraServlet {
         tags.meta(tags.httpEquiv := "Content-Type", tags.content := "text/html; charset=UTF-8"),
         tags.link(tags.rel := "stylesheet", tags.`type` := "text/css", href := "css/styleWUI.css"),
         tags.link(tags.rel := "stylesheet", tags.`type` := "text/css", href := "css/deps.css"),
-        tags.script(tags.`type` := "text/javascript", tags.src := "js/deps.js"),
         tags.script(tags.`type` := "text/javascript", tags.src := "js/demo.js")
       ),
-    //  body(onload := "run();")
+      body(
+      tags.div(id := "scalaWUI-content"),
+      tags.script("scalaWui.graph();")
+      )
     )
   }
 

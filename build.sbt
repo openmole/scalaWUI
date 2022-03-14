@@ -22,7 +22,8 @@ lazy val go = taskKey[Unit]("go")
 lazy val client = project.in(file("client")) enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin) settings(
   version := Version,
   scalaVersion := ScalaVersion,
-  scalaJSUseMainModuleInitializer := true,
+  scalaJSUseMainModuleInitializer := false,
+  webpackBundlingMode := BundlingMode.LibraryAndApplication(),
   //skip in packageJSDependencies := false,
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "autowire" % autowireVersion,
@@ -62,7 +63,6 @@ lazy val bootstrap = project.in(file("target/bootstrap")) enablePlugins(ScalaJSP
 
     val demoTarget = (target in server in Compile).value
     val demoResource = (resourceDirectory in client in Compile).value
-
 
     IO.copyFile(jsBuild, demoTarget / "webapp/js/demo.js")
     IO.copyDirectory(demoResource, demoTarget)
