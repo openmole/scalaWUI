@@ -8,8 +8,8 @@ val json4sVersion = "3.6.11"
 val autowireVersion = "0.3.3"
 val boopickleVersion = "1.3.3"
 val laminarVersion = "0.12.2"
-val scaladgetVersion = "1.9.0"
-val scalajsDomVersion = "1.1.0"
+val scaladgetVersion = "1.9.2"
+val scalajsDomVersion = "2.0.0"
 val scalatagsVersion = "0.9.4"
 
 lazy val shared = project.in(file("shared")) settings (
