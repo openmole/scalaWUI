@@ -24,10 +24,9 @@ import com.raquo.laminar.api.L.svg
 import com.raquo.domtypes.jsdom.defs.events.TypedTargetMouseEvent
 import org.scalajs
 import org.scalajs.dom.{KeyboardEvent, raw}
-import scala.concurrent.ExecutionContext.Implicits.global
-import autowire._
-import boopickle.Default._
 
+
+import fr.iscpif.client.APIClient
 import scala.scalajs.js.Dynamic
 
 trait Selectable {
@@ -139,12 +138,13 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
   }
 
   def mouseup(me: TypedTargetMouseEvent[raw.Element]) = {
+    import scala.concurrent.ExecutionContext.Implicits.global
     // Hide the drag line
     if (me.shiftKey && !dragLine.dragging.now) {
       val (x, y) = (me.clientX, me.clientY)
-      Post[shared.Api].uuid().call().foreach { i =>
-        println("I " + i)
-        addTask(task(i, x, y))
+      APIClient.uuid().future.onComplete { i =>
+        println("I " + i.get)
+        addTask(task(i.get, x, y))
       }
     }
     mouseDownTask.set(None)

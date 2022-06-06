@@ -6,11 +6,10 @@
 The project aims at building a small but complete client / server application using very powerfull scala tools to construct fully typed and reactive Web applications. Among them:
 
 - [scalajs](https://github.com/scala-js/scala-js)
-- [scalatra](http://scalatra.org/)
+- [endpoint4s](hhttps://endpoints4s.github.io)
 - [scalatags](https://github.com/lihaoyi/scalatags)
 - [scala.rx](https://github.com/lihaoyi/scala.rx)
-- [autowire](https://github.com/lihaoyi/autowire)
-- [boopickle](https://github.com/suzaku-io/boopickle)
+- [akka-http](https://doc.akka.io/docs/akka-http)
 
 as well as [scaladget](https://github.com/mathieuleclaire/scaladget) to draw some svg and display a [http://d3js.org/](D3.js)-like workflow.
 
@@ -21,12 +20,8 @@ First, build the javascript:
 ```sh
 $ cd scalaWUI
 $ sbt
-> go // Build the client JS files and move them to the right place
-```
-
-Then, start the server:
-```sh
-> jetty:start // Start the server
+> project server 
+> run // Build the client JS files and move them to the right place and start the server
 ```
 
 ## Play with the graph ##
@@ -41,3 +36,5 @@ The demo provides with a small graph based on d3.js library but with no D3 at al
 
 
 ![](http://public.iscpif.fr/~leclaire/graph.png)
+
+Open [http://localhost:8080/documentation.json](http://localhost:8080/documentation.json) to get the REST API documentation.
