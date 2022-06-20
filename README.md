@@ -16,7 +16,15 @@ as well as [scaladget](https://github.com/mathieuleclaire/scaladget) to draw som
 It is an empty ready-to-work application, dealing with all the starting wiring. This prototype also exposes as example a small Graph editor inspired from [http://bl.ocks.org/cjrd/6863459](http://bl.ocks.org/cjrd/6863459) javascript example, but written witten in a reactive way thanks to the [scala.rx](https://github.com/lihaoyi/scala.rx) library.
 
 ## Build & Run##
-First, build the javascript:
+For now the Scala 3 version of endpoint4s has not been published. Then you should clone the endpoints4s repo and publish it locally:
+
+```sh
+$ git clone git@github.com:endpoints4s/endpoints4s.git
+$ cd endpoints4s
+$ sbt +publishLocal 
+```
+
+Then execute:
 ```sh
 $ cd scalaWUI
 $ sbt
