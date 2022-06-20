@@ -107,7 +107,7 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
 
   val edges: Var[Seq[Edge]] = Var(Seq())
   _edges.map { e =>
-    addEdge(edge(e.source.now, e.target.now))
+    addEdge(edge(e.source.now(), e.target.now()))
   }
 
   val svgG = svg.g(
@@ -124,12 +124,12 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
 
 
   def mousemove(me: TypedTargetMouseEvent[raw.Element]) = {
-    Seq(mouseDownTask.now).flatten.map {
+    Seq(mouseDownTask.now()).flatten.map {
       t ⇒
         val x = me.clientX
         val y = me.clientY
         if (me.shiftKey) {
-          dragLine.move(t.location.now._1.toInt, t.location.now._2.toInt).line(x.toInt, y.toInt)
+          dragLine.move(t.location.now()._1.toInt, t.location.now()._2.toInt).line(x.toInt, y.toInt)
         }
         else {
           t.location.set((x, y))
@@ -140,9 +140,9 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
   def mouseup(me: TypedTargetMouseEvent[raw.Element]) = {
     import scala.concurrent.ExecutionContext.Implicits.global
     // Hide the drag line
-    if (me.shiftKey && !dragLine.dragging.now) {
+    if (me.shiftKey && !dragLine.dragging.now()) {
       val (x, y) = (me.clientX, me.clientY)
-      APIClient.uuid().future.onComplete { i =>
+      APIClient.uuid(()).future.onComplete { i =>
         println("I " + i.get)
         addTask(task(i.get, x, y))
       }
@@ -207,7 +207,7 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
       },
       onMouseUp --> {
         _ =>
-          Seq(mouseDownTask.now).flatten.map {
+          Seq(mouseDownTask.now()).flatten.map {
             mdt ⇒
               if (task != mdt) {
                 addEdge(edge(mdt, task))
@@ -254,25 +254,25 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
   scalajs.dom.document.onkeydown = (e: KeyboardEvent) => {
     e.keyCode match {
       case DELETE_KEY ⇒
-        tasks.now.filter(t ⇒ t.selected.now).map(t ⇒ removeTask(t))
-        edges.now.filter(e ⇒ e.selected.now).map(e ⇒ removeEdge(e))
+        tasks.now().filter(t ⇒ t.selected.now()).map(t ⇒ removeTask(t))
+        edges.now().filter(e ⇒ e.selected.now()).map(e ⇒ removeEdge(e))
       case _ ⇒
     }
   }
 
   // ADD, SELECT AND REMOVE ITEMS
-  def unselectTasks = tasks.now.foreach {
+  def unselectTasks = tasks.now().foreach {
     t ⇒ t.selected.set(false)
   }
 
-  def unselectEdges = edges.now.foreach {
+  def unselectEdges = edges.now().foreach {
     e ⇒ e.selected.set(false)
   }
 
   def removeTask(t: Task) = {
     tasks.update(ts => ts diff Seq(t))
     edges.update {
-      es => es.filterNot(e ⇒ e.source.now == t || e.target.now == t)
+      es => es.filterNot(e ⇒ e.source.now() == t || e.target.now() == t)
     }
   }
 
