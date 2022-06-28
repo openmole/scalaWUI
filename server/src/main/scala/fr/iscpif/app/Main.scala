@@ -1,34 +1,24 @@
 package fr.iscpif.app
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+import cats.effect._
+import org.http4s.blaze.server._
+import org.http4s.implicits._
+import org.http4s.server.Router
 
 object Main extends App {
-  implicit val system: ActorSystem = ActorSystem("server-system")
-  // needed for the future flatMap/onComplete in the end
 
-  val routes = RootPage.route ~ APIServer.routes ~ DocumentationServer.routes
+  import cats.effect.unsafe.IORuntime
+  implicit val runtime: IORuntime = cats.effect.unsafe.IORuntime.global
 
-  val bindingFuture = Http().newServerAt("0.0.0.0", 8080).bindFlow(routes)
-  bindingFuture.map(_.addToCoordinatedShutdown(hardTerminationDeadline = Duration.Zero))
+  val httpApp = Router("/" ->RootPage.routes, "/" -> APIServer.routes, "/" -> DocumentationServer.routes).orNotFound
+
+  val server =
+    BlazeServerBuilder[IO]
+      .bindHttp(8080, "localhost")
+      .withHttpApp(httpApp).allocated.unsafeRunSync()._2
+
   println("Press any key to stop")
   System.in.read()
-  system.terminate()
-}
-
-// Additional route for serving the OpenAPI documentation
-import endpoints4s.openapi.model.OpenApi
-import endpoints4s.akkahttp.server
-
-object DocumentationServer
-  extends server.Endpoints
-    with server.JsonEntitiesFromEncodersAndDecoders {
-
-  val routes =
-    endpoint(get(path / "documentation.json"), ok(jsonResponse[OpenApi]))
-      .implementedBy(_ => APIDocumentation.api)
+  server.unsafeRunSync()
 
 }

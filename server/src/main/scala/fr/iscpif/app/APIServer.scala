@@ -1,15 +1,15 @@
 package fr.iscpif.app
 
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
-import endpoints4s.akkahttp.server
+import cats.effect._
+import endpoints4s.http4s.server
+import org.http4s._
 
 /** Defines a Play router (and reverse router) for the endpoints described
  * in the `CounterEndpoints` trait.
  */
 object APIServer
-  extends shared.APIEndpoint
-    with server.Endpoints
+  extends server.Endpoints[IO]
+    with shared.APIEndpoint
     with server.JsonEntitiesFromSchemas {
 
   /** Simple implementation of an in-memory counter */
@@ -22,8 +22,12 @@ object APIServer
   // Implements the `increment` endpoint
   val fooRoute =
     foo.implementedBy(_ => shared.Data.Foo(7))
+//
+//  val routes: Route =
+//    uuidRoute ~ fooRoute
 
-  val routes: Route =
-    uuidRoute ~ fooRoute
+  val routes: HttpRoutes[IO] = HttpRoutes.of(
+    routesFromEndpoints(uuidRoute, fooRoute)
+  )
 
 }

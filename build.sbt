@@ -44,8 +44,11 @@ lazy val server = project.in(file("server")) settings(
   crossScalaVersions := supportedVersion,
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-    "org.endpoints4s" %% "akka-http-server" % "6.1.0+n",
-    "com.typesafe.akka" %% "akka-stream" % "2.6.19" cross CrossVersion.for3Use2_13
+    "org.endpoints4s" %% "http4s-server" % "9.0.0+n",
+    "org.http4s" %% "http4s-blaze-server" % "0.23.12"
+
+    //    "org.endpoints4s" %% "akka-http-server" % "6.1.0+n",
+//    "com.typesafe.akka" %% "akka-stream" % "2.6.18" //cross CrossVersion.for3Use2_13
   ),
 
   Compile / compile := {

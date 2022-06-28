@@ -17,3 +17,19 @@ object APIDocumentation
     )(uuid, foo)
 
 }
+
+// Additional route for serving the OpenAPI documentation
+import endpoints4s.openapi.model.OpenApi
+import endpoints4s.http4s.server
+import org.http4s._
+import cats.effect._
+
+object DocumentationServer
+  extends server.Endpoints[IO]
+    with server.JsonEntitiesFromEncodersAndDecoders {
+
+  val routes =
+    HttpRoutes.of(endpoint(get(path / "documentation.json"), ok(jsonResponse[OpenApi]))
+      .implementedBy(_ => APIDocumentation.api))
+
+}
