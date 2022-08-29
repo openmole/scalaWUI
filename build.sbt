@@ -2,22 +2,28 @@ val Organization = "org.openmole"
 val Name = "ScalaWUI"
 val Version = "0.4"
 val Scala2Version = "2.13.8"
-val Scala3Version = "3.1.2"
+val Scala3Version = "3.1.3"
 val ScalaVersion = Scala3Version
 val laminarVersion = "0.14.2"
 val scaladgetVersion = "1.9.2"
 val scalajsDomVersion = "2.0.0"
 val scalatagsVersion = "0.11.1"
-val supportedVersion = List(Scala2Version, Scala3Version)
+val supportedVersion = List(Scala3Version)
 
-val endpoints4SVersion = "1.7.0+n"
+val endpoints4SVersion = "1.8.0+n"
+val endpointCirceVersion = "2.2.0+n"
+
+
+//Global / resolvers += Resolver.sonatypeRepo("staging")
+
 
 lazy val shared = project.in(file("shared")) settings (
   scalaVersion := ScalaVersion,
   crossScalaVersions := supportedVersion,
   libraryDependencies ++= Seq(
-    "org.endpoints4s" %%% "algebra" % endpoints4SVersion,
-    "org.endpoints4s" %%% "json-schema-generic" % endpoints4SVersion)
+    "org.openmole.endpoints4s" %%% "algebra" % endpoints4SVersion,
+    "org.openmole.endpoints4s" %%% "json-schema-circe" % endpointCirceVersion,
+    "io.circe" %% "circe-generic" % "0.15.0-M1")
   ) enablePlugins (ScalaJSPlugin)
 
 lazy val client = project.in(file("client")) enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin) settings(
@@ -32,7 +38,7 @@ lazy val client = project.in(file("client")) enablePlugins(ScalaJSPlugin, ScalaJ
     "org.openmole.scaladget" %%% "svg" % scaladgetVersion,
     "org.openmole.scaladget" %%% "bootstrapnative" % scaladgetVersion,
     "org.scala-js" %%% "scalajs-dom" % scalajsDomVersion,
-    "org.endpoints4s" %%% "xhr-client" % "5.0.0+n"
+    "org.openmole.endpoints4s" %%% "xhr-client" % "5.1.0+n"
   )
 ) dependsOn (shared)
 
@@ -44,7 +50,7 @@ lazy val server = project.in(file("server")) settings(
   crossScalaVersions := supportedVersion,
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "scalatags" % scalatagsVersion,
-    "org.endpoints4s" %% "http4s-server" % "9.0.0+n",
+    "org.openmole.endpoints4s" %% "http4s-server" % "10.0.0+n",
     "org.http4s" %% "http4s-blaze-server" % "0.23.12"
 
     //    "org.endpoints4s" %% "akka-http-server" % "6.1.0+n",

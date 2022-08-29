@@ -10,7 +10,7 @@ object Main extends App {
   import cats.effect.unsafe.IORuntime
   implicit val runtime: IORuntime = cats.effect.unsafe.IORuntime.global
 
-  val httpApp = Router("/" ->RootPage.routes, "/" -> APIServer.routes, "/" -> DocumentationServer.routes).orNotFound
+  val httpApp = Router("/" ->RootPage.routes, "/" -> APIServer.routes/*, "/" -> DocumentationServer.routes*/).orNotFound
 
   val server =
     BlazeServerBuilder[IO]

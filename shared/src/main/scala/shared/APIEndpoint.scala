@@ -1,6 +1,8 @@
 package shared
 
-import endpoints4s.{algebra, generic}
+import endpoints4s.{algebra, circe}
+import io.circe._
+import io.circe.generic.auto._
 
 /** Defines the HTTP endpoints description of a web service implementing a counter.
  * This web service has two endpoints: one for getting the current value of the counter,
@@ -8,15 +10,15 @@ import endpoints4s.{algebra, generic}
  */
 trait APIEndpoint
   extends algebra.Endpoints
-    with algebra.JsonEntitiesFromSchemas
-    with generic.JsonSchemas {
+    with algebra.circe.JsonEntitiesFromCodecs
+    with circe.JsonSchemas {
 
   /** Get the counter current value.
    * Uses the HTTP verb “GET” and URL path “/current-value”.
    * The response entity is a JSON document representing the counter value.
    */
-  val uuid: Endpoint[Unit, String] =
-    endpoint(get(path / "uuid"), ok(jsonResponse[String]))
+  val uuid: Endpoint[Data.Foo, String] =
+    endpoint(post(path / "uuid", jsonRequest[Data.Foo]), ok(jsonResponse[String]))
 
   /** Increments the counter value.
    * Uses the HTTP verb “POST” and URL path “/increment”.
@@ -31,6 +33,9 @@ trait APIEndpoint
 
   // Generically derive the JSON schema of our `Counter`
   // and `Increment` case classes defined thereafter
-  implicit lazy val fooSchema: JsonSchema[Data.Foo] = genericJsonSchema
+//  implicit lazy val fooEnc: Encoder[Data.Foo] = implicitly //JsonSchema[Data.Foo]
+//  implicit lazy val fooDec: Decoder[Data.Foo] = implicitly //JsonSchema[Data.Foo]
+  //implicit lazy val fooSchema: Codec[Data.Foo] = deriveCodec[Data.Foo]
+
 
 }

@@ -10,6 +10,6 @@ import endpoints4s.xhr.EndpointsSettings
 object APIClient
   extends shared.APIEndpoint
     with xhr.future.Endpoints
-    with xhr.JsonEntitiesFromSchemas {
+    with xhr.JsonEntitiesFromCodecs {
   lazy val settings: EndpointsSettings = EndpointsSettings()
 }

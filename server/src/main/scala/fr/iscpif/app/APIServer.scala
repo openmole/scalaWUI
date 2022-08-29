@@ -10,7 +10,10 @@ import org.http4s._
 object APIServer
   extends server.Endpoints[IO]
     with shared.APIEndpoint
-    with server.JsonEntitiesFromSchemas {
+    with server.JsonEntitiesFromCodecs { //with server.ChunkedEntities {
+
+  //def stringCodec[A](implicit codec: JsonCodec[A]) = codec.stringCodec
+  //trait JsonSchema
 
   /** Simple implementation of an in-memory counter */
  // val counter = Ref(0)

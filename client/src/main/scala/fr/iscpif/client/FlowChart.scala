@@ -142,7 +142,7 @@ class GraphCreator(_tasks: Seq[Task], _edges: Seq[Edge]) {
     // Hide the drag line
     if (me.shiftKey && !dragLine.dragging.now()) {
       val (x, y) = (me.clientX, me.clientY)
-      APIClient.uuid(()).future.onComplete { i =>
+      APIClient.uuid(shared.Data.Foo(42)).future.onComplete { i =>
         println("I " + i.get)
         addTask(task(i.get, x, y))
       }
