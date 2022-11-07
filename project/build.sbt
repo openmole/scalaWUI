@@ -1,8 +1,8 @@
 resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.10.0")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.11.0")
 
-addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.20.0")
+addSbtPlugin("ch.epfl.scala" % "sbt-scalajs-bundler" % "0.21.0")
 
 //addSbtPlugin("org.scalatra.sbt" % "sbt-scalatra" % "1.0.4")
 

@@ -1,8 +1,8 @@
 val Organization = "org.openmole"
 val Name = "ScalaWUI"
 val Version = "0.4"
-val Scala2Version = "2.13.8"
-val Scala3Version = "3.1.3"
+val Scala2Version = "2.13.10"
+val Scala3Version = "3.2.1"
 val ScalaVersion = Scala3Version
 val laminarVersion = "0.14.2"
 val scaladgetVersion = "1.9.2"
@@ -23,7 +23,7 @@ lazy val shared = project.in(file("shared")) settings (
   libraryDependencies ++= Seq(
     "org.openmole.endpoints4s" %%% "algebra" % endpoints4SVersion,
     "org.openmole.endpoints4s" %%% "json-schema-circe" % endpointCirceVersion,
-    "io.circe" %% "circe-generic" % "0.15.0-M1")
+    "io.circe" %% "circe-generic" % "0.14.3")
   ) enablePlugins (ScalaJSPlugin)
 
 lazy val client = project.in(file("client")) enablePlugins(ScalaJSPlugin, ScalaJSBundlerPlugin) settings(
@@ -51,7 +51,8 @@ lazy val server = project.in(file("server")) settings(
   libraryDependencies ++= Seq(
     "com.lihaoyi" %% "scalatags" % scalatagsVersion,
     "org.openmole.endpoints4s" %% "http4s-server" % "10.0.0+n",
-    "org.http4s" %% "http4s-blaze-server" % "0.23.12"
+    "org.http4s" %% "http4s-blaze-server" % "0.23.12",
+    "io.circe" %% "circe-parser" % "0.14.3"
 
     //    "org.endpoints4s" %% "akka-http-server" % "6.1.0+n",
 //    "com.typesafe.akka" %% "akka-stream" % "2.6.18" //cross CrossVersion.for3Use2_13
