@@ -32,6 +32,7 @@ lazy val client = project.in(file("client")) enablePlugins(ScalaJSPlugin, ScalaJ
   crossScalaVersions := supportedVersion,
   scalaJSUseMainModuleInitializer := false,
   webpackBundlingMode := BundlingMode.LibraryAndApplication(),
+  webpackNodeArgs := Seq("--openssl-legacy-provider"),
   libraryDependencies ++= Seq(
     "com.raquo" %%% "laminar" % laminarVersion,
     "org.openmole.scaladget" %%% "tools" % scaladgetVersion,
